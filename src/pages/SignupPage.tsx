@@ -37,9 +37,18 @@ export default function SignupPage() {
 
     if (error) {
       toast({ title: "Erro ao criar conta", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Conta criada!", description: "Verifique seu email para confirmar o cadastro." });
+      setLoading(false);
+      return;
+    }
+
+    // Auto-login após signup (auto-confirm está ativo)
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      toast({ title: "Conta criada!", description: "Faça login para continuar." });
       navigate("/login");
+    } else {
+      toast({ title: "Bem-vindo ao Kaira", description: "Sua conta foi criada com sucesso." });
+      navigate("/dashboard");
     }
     setLoading(false);
   };
