@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, History, Settings, Zap } from "lucide-react";
+import { LayoutDashboard, Users, History, Settings, Zap, Target } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Clientes", url: "/clients", icon: Users },
+  { title: "Públicos", url: "/audiences", icon: Target },
   { title: "Histórico", url: "/timeline", icon: History },
 ];
 

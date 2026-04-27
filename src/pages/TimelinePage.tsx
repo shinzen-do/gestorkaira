@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { TimelineView } from "@/components/TimelineView";
-import { clients } from "@/data/mockData";
+import { useAppData } from "@/contexts/AppDataContext";
 import type { TimelineEntry } from "@/data/mockData";
 
 const types = ["all", "creative", "budget", "audience", "bid", "status", "note"] as const;
@@ -16,6 +16,7 @@ const typeLabels: Record<string, string> = {
 };
 
 export default function TimelinePage() {
+  const { clients, audiences, audienceTimelines } = useAppData();
   const [filter, setFilter] = useState<TimelineEntry["type"] | "all">("all");
 
   const allEntries = useMemo(() => {
@@ -28,8 +29,11 @@ export default function TimelinePage() {
         });
       });
     });
+    audiences.forEach((a) => {
+      (audienceTimelines[a.id] ?? []).forEach((t) => entries.push({ ...t, source: `Público · ${a.name}` }));
+    });
     return entries.sort((a, b) => b.date.localeCompare(a.date));
-  }, []);
+  }, [clients, audiences, audienceTimelines]);
 
   const filtered = filter === "all" ? allEntries : allEntries.filter((e) => e.type === filter);
 
@@ -37,7 +41,7 @@ export default function TimelinePage() {
     <div className="max-w-4xl mx-auto space-y-8">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Histórico de Alterações</h1>
-        <p className="text-sm text-muted-foreground mt-1">Timeline completa de todas as mudanças em campanhas e CAs</p>
+        <p className="text-sm text-muted-foreground mt-1">Timeline completa de todas as mudanças em campanhas, conjuntos e públicos</p>
       </motion.div>
 
       <div className="flex gap-1.5 flex-wrap">
@@ -59,7 +63,7 @@ export default function TimelinePage() {
           <div className="space-y-0">
             {filtered.map((entry, i) => (
               <div key={entry.id + i}>
-                <p className="text-[10px] text-muted-foreground ml-12 mb-1 uppercase tracking-wider">{(entry as any).source}</p>
+                <p className="text-[10px] text-muted-foreground ml-12 mb-1 uppercase tracking-wider">{entry.source}</p>
                 <TimelineView entries={[entry]} />
               </div>
             ))}

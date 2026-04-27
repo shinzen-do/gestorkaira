@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { ClientTree } from "@/components/ClientTree";
-import { clients, dailyMetrics } from "@/data/mockData";
+import { dailyMetrics } from "@/data/mockData";
+import { useAppData } from "@/contexts/AppDataContext";
 import { DollarSign, TrendingUp, Target, ShoppingCart } from "lucide-react";
 
 const today = dailyMetrics[dailyMetrics.length - 1];
@@ -14,6 +15,7 @@ const avg7 = {
 };
 
 export default function Dashboard() {
+  const { clients } = useAppData();
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -22,32 +24,10 @@ export default function Dashboard() {
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          label="CPA Hoje"
-          value={today.cpa.toFixed(2)}
-          prefix="R$"
-          change={-((today.cpa - avg7.cpa) / avg7.cpa) * 100}
-          icon={<Target className="w-4 h-4" />}
-        />
-        <MetricCard
-          label="ROAS Hoje"
-          value={`${today.roas.toFixed(1)}x`}
-          change={((today.roas - avg7.roas) / avg7.roas) * 100}
-          icon={<TrendingUp className="w-4 h-4" />}
-        />
-        <MetricCard
-          label="Investido Hoje"
-          value={today.spend.toLocaleString()}
-          prefix="R$"
-          change={((today.spend - avg7.spend) / avg7.spend) * 100}
-          icon={<DollarSign className="w-4 h-4" />}
-        />
-        <MetricCard
-          label="Conversões Hoje"
-          value={today.conversions.toString()}
-          change={((today.conversions - avg7.conversions) / avg7.conversions) * 100}
-          icon={<ShoppingCart className="w-4 h-4" />}
-        />
+        <MetricCard label="CPA Hoje" value={today.cpa.toFixed(2)} prefix="R$" change={-((today.cpa - avg7.cpa) / avg7.cpa) * 100} icon={<Target className="w-4 h-4" />} />
+        <MetricCard label="ROAS Hoje" value={`${today.roas.toFixed(1)}x`} change={((today.roas - avg7.roas) / avg7.roas) * 100} icon={<TrendingUp className="w-4 h-4" />} />
+        <MetricCard label="Investido Hoje" value={today.spend.toLocaleString()} prefix="R$" change={((today.spend - avg7.spend) / avg7.spend) * 100} icon={<DollarSign className="w-4 h-4" />} />
+        <MetricCard label="Conversões Hoje" value={today.conversions.toString()} change={((today.conversions - avg7.conversions) / avg7.conversions) * 100} icon={<ShoppingCart className="w-4 h-4" />} />
       </div>
 
       <PerformanceChart />
