@@ -373,6 +373,10 @@ export const clients: Client[] = [
         timeline: [],
       },
     ],
+    validatedCreatives: [
+      { id: "vc4", name: "Carrossel Antes/Depois — Sérum", format: "carousel", validatedAt: "2025-04-21", validatedBy: "Marina", tags: ["Antes/Depois", "Prova social"], notes: "Validado para todos lançamentos skincare", performance: { ctr: 2.9 } },
+      { id: "vc5", name: "Vídeo Influencer @bellabeauty", format: "video", validatedAt: "2025-04-19", validatedBy: "Lucas", tags: ["Influencer", "UGC"], performance: { ctr: 3.2, roas: 2.8 } },
+    ],
   },
   {
     id: "c3",
