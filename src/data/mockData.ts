@@ -64,6 +64,18 @@ export interface Campaign {
   timeline: TimelineEntry[];
 }
 
+export interface ValidatedCreative {
+  id: string;
+  name: string;
+  format: "image" | "video" | "carousel";
+  validatedAt: string;
+  validatedBy?: string;
+  tags?: string[];
+  notes?: string;
+  performance?: { ctr?: number; cpa?: number; roas?: number };
+  url?: string;
+}
+
 export interface Client {
   id: string;
   name: string;
@@ -73,6 +85,7 @@ export interface Client {
   avgCpa: number;
   avgRoas: number;
   campaigns: Campaign[];
+  validatedCreatives?: ValidatedCreative[];
 }
 
 export interface DailyMetric {
