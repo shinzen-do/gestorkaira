@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, History, Plus, BarChart3, Film, Target } from "lucide-react";
+import { ChevronRight, History, Plus, BarChart3, Film, Target, Megaphone, Users, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HealthBadge } from "./HealthBadge";
 import { TimelineView } from "./TimelineView";
 import { AddChangeDialog } from "./AddChangeDialog";
 import { CreativesPanel } from "./CreativesPanel";
+import { ClientAudiencesPanel } from "./ClientAudiencesPanel";
+import { ClientValidatedCreativesPanel } from "./ClientValidatedCreativesPanel";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAppData } from "@/contexts/AppDataContext";
 import type { Client, Campaign, AdSet } from "@/data/mockData";
 
