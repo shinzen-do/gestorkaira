@@ -64,6 +64,18 @@ export interface Campaign {
   timeline: TimelineEntry[];
 }
 
+export interface ValidatedCreative {
+  id: string;
+  name: string;
+  format: "image" | "video" | "carousel";
+  validatedAt: string;
+  validatedBy?: string;
+  tags?: string[];
+  notes?: string;
+  performance?: { ctr?: number; cpa?: number; roas?: number };
+  url?: string;
+}
+
 export interface Client {
   id: string;
   name: string;
@@ -73,6 +85,7 @@ export interface Client {
   avgCpa: number;
   avgRoas: number;
   campaigns: Campaign[];
+  validatedCreatives?: ValidatedCreative[];
 }
 
 export interface DailyMetric {
@@ -296,6 +309,11 @@ export const clients: Client[] = [
         timeline: [],
       },
     ],
+    validatedCreatives: [
+      { id: "vc1", name: "Vídeo UGC — Depoimento CTO", format: "video", validatedAt: "2025-04-22", validatedBy: "Lucas (Diretor Criativo)", tags: ["UGC", "Top performer"], notes: "Aprovado para escalar em todos CAs B2B", performance: { ctr: 3.8, cpa: 19.5, roas: 5.2 } },
+      { id: "vc2", name: "Estático — Headline ROI", format: "image", validatedAt: "2025-04-18", validatedBy: "Marina", tags: ["Hook forte"], performance: { ctr: 2.1 } },
+      { id: "vc3", name: "Vídeo Founder Story", format: "video", validatedAt: "2025-04-15", validatedBy: "Lucas", tags: ["Storytelling"], performance: { ctr: 2.4, roas: 3.7 } },
+    ],
   },
   {
     id: "c2",
@@ -306,6 +324,7 @@ export const clients: Client[] = [
     avgCpa: 31.2,
     avgRoas: 3.1,
     campaigns: [
+
       {
         id: "camp3",
         name: "Lançamento — Sérum Vitamina C",
@@ -354,6 +373,10 @@ export const clients: Client[] = [
         timeline: [],
       },
     ],
+    validatedCreatives: [
+      { id: "vc4", name: "Carrossel Antes/Depois — Sérum", format: "carousel", validatedAt: "2025-04-21", validatedBy: "Marina", tags: ["Antes/Depois", "Prova social"], notes: "Validado para todos lançamentos skincare", performance: { ctr: 2.9 } },
+      { id: "vc5", name: "Vídeo Influencer @bellabeauty", format: "video", validatedAt: "2025-04-19", validatedBy: "Lucas", tags: ["Influencer", "UGC"], performance: { ctr: 3.2, roas: 2.8 } },
+    ],
   },
   {
     id: "c3",
@@ -396,6 +419,9 @@ export const clients: Client[] = [
         ],
         timeline: [],
       },
+    ],
+    validatedCreatives: [
+      { id: "vc6", name: "Estático — Promessa 21 dias", format: "image", validatedAt: "2025-04-10", validatedBy: "Lucas", tags: ["Promessa"], notes: "Aprovado mas resultado abaixo do esperado", performance: { ctr: 1.1 } },
     ],
   },
 ];

@@ -1,5 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useMemo } from "react";
-import { clients as initialClients, audiences as initialAudiences, type Client, type Audience, type TimelineEntry } from "@/data/mockData";
+import {
+  clients as initialClients,
+  audiences as initialAudiences,
+  type Client,
+  type Audience,
+  type TimelineEntry,
+  type ValidatedCreative,
+} from "@/data/mockData";
 
 type TargetType = "client" | "campaign" | "adset" | "audience";
 
@@ -16,6 +23,30 @@ interface SearchHit {
   context: string;
 }
 
+export type CalendarPriority = "low" | "medium" | "high";
+export type CalendarLinkType = "client" | "campaign" | "audience" | "none";
+
+export interface CalendarNote {
+  id: string;
+  title: string;
+  description?: string;
+  date: string; // ISO YYYY-MM-DD — when the change/task should happen or deadline
+  priority: CalendarPriority;
+  linkType: CalendarLinkType;
+  linkId?: string;
+  done: boolean;
+  createdAt: string;
+}
+
+interface AddCalendarNoteArgs {
+  title: string;
+  description?: string;
+  date: string;
+  priority: CalendarPriority;
+  linkType: CalendarLinkType;
+  linkId?: string;
+}
+
 interface AppDataContextValue {
   clients: Client[];
   audiences: Audience[];
@@ -23,6 +54,14 @@ interface AppDataContextValue {
   addTimelineEntry: (args: AddTimelineArgs) => void;
   toggleAudience: (id: string) => void;
   search: (q: string) => SearchHit[];
+  // Calendar
+  calendarNotes: CalendarNote[];
+  addCalendarNote: (n: AddCalendarNoteArgs) => void;
+  toggleCalendarNote: (id: string) => void;
+  deleteCalendarNote: (id: string) => void;
+  // Validated creatives
+  addValidatedCreative: (clientId: string, c: Omit<ValidatedCreative, "id" | "validatedAt"> & { validatedAt?: string }) => void;
+  removeValidatedCreative: (clientId: string, creativeId: string) => void;
 }
 
 const AppDataContext = createContext<AppDataContextValue | null>(null);
@@ -31,6 +70,30 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState<Client[]>(initialClients);
   const [audiences, setAudiences] = useState<Audience[]>(initialAudiences);
   const [audienceTimelines, setAudienceTimelines] = useState<Record<string, TimelineEntry[]>>({});
+  const [calendarNotes, setCalendarNotes] = useState<CalendarNote[]>([
+    {
+      id: "cn-seed-1",
+      title: "Revisar criativos da campanha Belle Vit. C",
+      description: "Trocar criativos com CTR < 2% antes do fim de semana.",
+      date: new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10),
+      priority: "high",
+      linkType: "client",
+      linkId: "c2",
+      done: false,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "cn-seed-2",
+      title: "Subir orçamento — TechNova Lead Gen",
+      description: "ROAS estável em 4.8x, escalar 30%.",
+      date: new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10),
+      priority: "medium",
+      linkType: "campaign",
+      linkId: "camp1",
+      done: false,
+      createdAt: new Date().toISOString(),
+    },
+  ]);
 
   const addTimelineEntry = ({ targetType, targetId, entry }: AddTimelineArgs) => {
     const newEntry: TimelineEntry = {
@@ -76,6 +139,54 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const addCalendarNote = (n: AddCalendarNoteArgs) => {
+    setCalendarNotes((prev) => [
+      {
+        id: `cn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        ...n,
+        done: false,
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  };
+
+  const toggleCalendarNote = (id: string) =>
+    setCalendarNotes((prev) => prev.map((n) => (n.id === id ? { ...n, done: !n.done } : n)));
+
+  const deleteCalendarNote = (id: string) =>
+    setCalendarNotes((prev) => prev.filter((n) => n.id !== id));
+
+  const addValidatedCreative: AppDataContextValue["addValidatedCreative"] = (clientId, c) => {
+    setClients((prev) =>
+      prev.map((cl) =>
+        cl.id === clientId
+          ? {
+              ...cl,
+              validatedCreatives: [
+                {
+                  id: `vc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                  validatedAt: c.validatedAt ?? new Date().toISOString().slice(0, 10),
+                  ...c,
+                },
+                ...(cl.validatedCreatives ?? []),
+              ],
+            }
+          : cl,
+      ),
+    );
+  };
+
+  const removeValidatedCreative = (clientId: string, creativeId: string) => {
+    setClients((prev) =>
+      prev.map((cl) =>
+        cl.id === clientId
+          ? { ...cl, validatedCreatives: (cl.validatedCreatives ?? []).filter((c) => c.id !== creativeId) }
+          : cl,
+      ),
+    );
+  };
+
   const search = (q: string): SearchHit[] => {
     const term = q.trim().toLowerCase();
     if (!term) return [];
@@ -107,8 +218,21 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ clients, audiences, audienceTimelines, addTimelineEntry, toggleAudience, search }),
-    [clients, audiences, audienceTimelines],
+    () => ({
+      clients,
+      audiences,
+      audienceTimelines,
+      addTimelineEntry,
+      toggleAudience,
+      search,
+      calendarNotes,
+      addCalendarNote,
+      toggleCalendarNote,
+      deleteCalendarNote,
+      addValidatedCreative,
+      removeValidatedCreative,
+    }),
+    [clients, audiences, audienceTimelines, calendarNotes],
   );
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;

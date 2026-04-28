@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, History, Plus, BarChart3, Film, Target } from "lucide-react";
+import { ChevronRight, History, Plus, BarChart3, Film, Target, Megaphone, Users, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HealthBadge } from "./HealthBadge";
 import { TimelineView } from "./TimelineView";
 import { AddChangeDialog } from "./AddChangeDialog";
 import { CreativesPanel } from "./CreativesPanel";
+import { ClientAudiencesPanel } from "./ClientAudiencesPanel";
+import { ClientValidatedCreativesPanel } from "./ClientValidatedCreativesPanel";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAppData } from "@/contexts/AppDataContext";
 import type { Client, Campaign, AdSet } from "@/data/mockData";
 
@@ -214,10 +217,32 @@ export function ClientTree({ client, defaultExpanded = false }: { client: Client
       </div>
       <AnimatePresence>
         {expanded && (
-          <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden border-t border-border pb-4">
-            {client.campaigns.map((c) => (
-              <CampaignRow key={c.id} campaign={c} clientName={client.name} />
-            ))}
+          <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden border-t border-border">
+            <Tabs defaultValue="campaigns" className="px-4 py-3">
+              <TabsList className="bg-secondary/40">
+                <TabsTrigger value="campaigns" className="text-xs gap-1.5">
+                  <Megaphone className="w-3.5 h-3.5" /> Campanhas
+                  <span className="ml-1 text-[10px] text-muted-foreground">{client.campaigns.length}</span>
+                </TabsTrigger>
+                <TabsTrigger value="audiences" className="text-xs gap-1.5">
+                  <Users className="w-3.5 h-3.5" /> Públicos
+                </TabsTrigger>
+                <TabsTrigger value="creatives" className="text-xs gap-1.5">
+                  <Award className="w-3.5 h-3.5" /> Criativos validados
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="campaigns" className="mt-3 -mx-4">
+                {client.campaigns.map((c) => (
+                  <CampaignRow key={c.id} campaign={c} clientName={client.name} />
+                ))}
+              </TabsContent>
+              <TabsContent value="audiences" className="mt-3">
+                <ClientAudiencesPanel clientId={client.id} />
+              </TabsContent>
+              <TabsContent value="creatives" className="mt-3">
+                <ClientValidatedCreativesPanel clientId={client.id} />
+              </TabsContent>
+            </Tabs>
           </motion.div>
         )}
       </AnimatePresence>

@@ -14,6 +14,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Index from "./pages/Index";
 import ClientsPage from "./pages/ClientsPage";
 import AudiencesPage from "./pages/AudiencesPage";
+import CalendarPage from "./pages/CalendarPage";
 import TimelinePage from "./pages/TimelinePage";
 import NotFound from "./pages/NotFound";
 
@@ -56,6 +57,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <AppLayout><AudiencesPage /></AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><CalendarPage /></AppLayout>
                   </ProtectedRoute>
                 }
               />
