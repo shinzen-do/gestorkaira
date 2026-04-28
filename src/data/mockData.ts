@@ -309,6 +309,11 @@ export const clients: Client[] = [
         timeline: [],
       },
     ],
+    validatedCreatives: [
+      { id: "vc1", name: "Vídeo UGC — Depoimento CTO", format: "video", validatedAt: "2025-04-22", validatedBy: "Lucas (Diretor Criativo)", tags: ["UGC", "Top performer"], notes: "Aprovado para escalar em todos CAs B2B", performance: { ctr: 3.8, cpa: 19.5, roas: 5.2 } },
+      { id: "vc2", name: "Estático — Headline ROI", format: "image", validatedAt: "2025-04-18", validatedBy: "Marina", tags: ["Hook forte"], performance: { ctr: 2.1 } },
+      { id: "vc3", name: "Vídeo Founder Story", format: "video", validatedAt: "2025-04-15", validatedBy: "Lucas", tags: ["Storytelling"], performance: { ctr: 2.4, roas: 3.7 } },
+    ],
   },
   {
     id: "c2",
@@ -319,6 +324,7 @@ export const clients: Client[] = [
     avgCpa: 31.2,
     avgRoas: 3.1,
     campaigns: [
+
       {
         id: "camp3",
         name: "Lançamento — Sérum Vitamina C",
