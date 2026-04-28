@@ -420,5 +420,8 @@ export const clients: Client[] = [
         timeline: [],
       },
     ],
+    validatedCreatives: [
+      { id: "vc6", name: "Estático — Promessa 21 dias", format: "image", validatedAt: "2025-04-10", validatedBy: "Lucas", tags: ["Promessa"], notes: "Aprovado mas resultado abaixo do esperado", performance: { ctr: 1.1 } },
+    ],
   },
 ];
