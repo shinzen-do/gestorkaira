@@ -1,4 +1,3 @@
-import Dashboard from "./Dashboard";
-
-const Index = () => <Dashboard />;
+import HomePage from "./HomePage";
+const Index = () => <HomePage />;
 export default Index;
