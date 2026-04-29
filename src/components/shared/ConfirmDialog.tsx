@@ -10,7 +10,7 @@ interface Props {
   description?: string;
   confirmLabel?: string;
   destructive?: boolean;
-  onConfirm: () => void | Promise<void>;
+  onConfirm: () => unknown | Promise<unknown>;
 }
 
 export function ConfirmDialog({ trigger, title, description, confirmLabel = "Confirmar", destructive, onConfirm }: Props) {

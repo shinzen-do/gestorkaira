@@ -5,84 +5,59 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AppDataProvider } from "@/contexts/AppDataContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Index from "./pages/Index";
+import HomePage from "./pages/HomePage";
 import ClientsPage from "./pages/ClientsPage";
 import AudiencesPage from "./pages/AudiencesPage";
 import CalendarPage from "./pages/CalendarPage";
 import TimelinePage from "./pages/TimelinePage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const Protected = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute><AppLayout>{children}</AppLayout></ProtectedRoute>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <AppDataProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <ThemeProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <AppDataProvider>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Protected routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><Index /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/clients"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><ClientsPage /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/audiences"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><AudiencesPage /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/calendar"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><CalendarPage /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/timeline"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout><TimelinePage /></AppLayout>
-                  </ProtectedRoute>
-                }
-              />
+                  <Route path="/dashboard" element={<Protected><HomePage /></Protected>} />
+                  <Route path="/clients" element={<Protected><ClientsPage /></Protected>} />
+                  <Route path="/audiences" element={<Protected><AudiencesPage /></Protected>} />
+                  <Route path="/calendar" element={<Protected><CalendarPage /></Protected>} />
+                  <Route path="/timeline" element={<Protected><TimelinePage /></Protected>} />
+                  <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppDataProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AppDataProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
