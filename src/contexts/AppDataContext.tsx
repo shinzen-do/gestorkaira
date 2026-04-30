@@ -11,6 +11,7 @@ export type Gender = "all" | "male" | "female";
 export type Impact = "positive" | "negative" | "neutral";
 export type TimelineType = "creative" | "budget" | "audience" | "bid" | "status" | "note";
 export type TargetType = "client" | "campaign" | "adset" | "audience" | "creative";
+export type BudgetType = "daily" | "total";
 
 export interface Client {
   id: string;
@@ -29,6 +30,7 @@ export interface Campaign {
   objective: string | null;
   status: Status;
   budget: number;
+  budget_type: BudgetType;
   spend: number;
   roas: number;
   created_at: string;
@@ -40,6 +42,7 @@ export interface AdSet {
   name: string;
   status: Status;
   budget: number;
+  budget_type: BudgetType;
   created_at: string;
 }
 
@@ -50,6 +53,10 @@ export interface Creative {
   format: CreativeFormat;
   status: Status;
   url: string | null;
+  results: number;
+  result_label: string;
+  cost_per_result: number;
+  // legados (mantidos para compat de leitura)
   ctr: number;
   impressions: number;
   created_at: string;
@@ -136,18 +143,18 @@ interface Ctx {
   deleteClient: (id: string) => Promise<void>;
 
   // Campaigns
-  createCampaign: (input: { client_id: string; name: string; objective?: string; budget?: number }) => Promise<Campaign | null>;
-  updateCampaign: (id: string, patch: Partial<Pick<Campaign, "name" | "objective" | "status" | "budget" | "spend" | "roas">>) => Promise<void>;
+  createCampaign: (input: { client_id: string; name: string; objective?: string; budget?: number; budget_type?: BudgetType }) => Promise<Campaign | null>;
+  updateCampaign: (id: string, patch: Partial<Pick<Campaign, "name" | "objective" | "status" | "budget" | "budget_type" | "spend" | "roas">>) => Promise<void>;
   deleteCampaign: (id: string) => Promise<void>;
 
   // AdSets
-  createAdSet: (input: { campaign_id: string; name: string; budget?: number }) => Promise<AdSet | null>;
-  updateAdSet: (id: string, patch: Partial<Pick<AdSet, "name" | "status" | "budget">>) => Promise<void>;
+  createAdSet: (input: { campaign_id: string; name: string; budget?: number; budget_type?: BudgetType }) => Promise<AdSet | null>;
+  updateAdSet: (id: string, patch: Partial<Pick<AdSet, "name" | "status" | "budget" | "budget_type">>) => Promise<void>;
   deleteAdSet: (id: string) => Promise<void>;
 
   // Creatives
-  createCreative: (input: { ad_set_id: string; name: string; format?: CreativeFormat; url?: string }) => Promise<Creative | null>;
-  updateCreative: (id: string, patch: Partial<Pick<Creative, "name" | "format" | "status" | "url" | "ctr" | "impressions">>) => Promise<void>;
+  createCreative: (input: { ad_set_id: string; name: string; format?: CreativeFormat; url?: string; result_label?: string }) => Promise<Creative | null>;
+  updateCreative: (id: string, patch: Partial<Pick<Creative, "name" | "format" | "status" | "url" | "results" | "result_label" | "cost_per_result" | "ctr" | "impressions">>) => Promise<void>;
   deleteCreative: (id: string) => Promise<void>;
 
   // Audiences

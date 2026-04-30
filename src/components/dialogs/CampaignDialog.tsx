@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAppData, type Campaign } from "@/contexts/AppDataContext";
+import { useAppData, type Campaign, type BudgetType } from "@/contexts/AppDataContext";
 import { toast } from "sonner";
 
 interface Props {
@@ -24,6 +24,7 @@ export function CampaignDialog({ trigger, clientId, campaign }: Props) {
   const [name, setName] = useState("");
   const [objective, setObjective] = useState("Vendas");
   const [budget, setBudget] = useState("0");
+  const [budgetType, setBudgetType] = useState<BudgetType>("daily");
   const [spend, setSpend] = useState("0");
   const [roas, setRoas] = useState("0");
   const [status, setStatus] = useState<"active" | "paused" | "archived">("active");
@@ -32,10 +33,12 @@ export function CampaignDialog({ trigger, clientId, campaign }: Props) {
   useEffect(() => {
     if (open && campaign) {
       setName(campaign.name); setObjective(campaign.objective ?? "Vendas");
-      setBudget(String(campaign.budget)); setSpend(String(campaign.spend));
+      setBudget(String(campaign.budget)); setBudgetType(campaign.budget_type ?? "daily");
+      setSpend(String(campaign.spend));
       setRoas(String(campaign.roas)); setStatus(campaign.status);
     } else if (open) {
-      setName(""); setObjective("Vendas"); setBudget("0"); setSpend("0"); setRoas("0"); setStatus("active");
+      setName(""); setObjective("Vendas"); setBudget("0"); setBudgetType("daily");
+      setSpend("0"); setRoas("0"); setStatus("active");
     }
   }, [open, campaign]);
 
@@ -45,12 +48,12 @@ export function CampaignDialog({ trigger, clientId, campaign }: Props) {
     try {
       if (campaign) {
         await updateCampaign(campaign.id, {
-          name: name.trim(), objective, budget: Number(budget) || 0,
+          name: name.trim(), objective, budget: Number(budget) || 0, budget_type: budgetType,
           spend: Number(spend) || 0, roas: Number(roas) || 0, status,
         });
         toast.success("Campanha atualizada");
       } else {
-        await createCampaign({ client_id: clientId, name: name.trim(), objective, budget: Number(budget) || 0 });
+        await createCampaign({ client_id: clientId, name: name.trim(), objective, budget: Number(budget) || 0, budget_type: budgetType });
         toast.success("Campanha criada");
       }
       setOpen(false);
@@ -69,14 +72,26 @@ export function CampaignDialog({ trigger, clientId, campaign }: Props) {
         </DialogHeader>
         <div className="space-y-3 py-2">
           <div className="space-y-1.5"><Label>Nome *</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex.: Black Friday — Conversão" /></div>
+          <div className="space-y-1.5"><Label>Objetivo</Label>
+            <Select value={objective} onValueChange={setObjective}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{objectives.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label>Objetivo</Label>
-              <Select value={objective} onValueChange={setObjective}>
+            <div className="space-y-1.5"><Label>Tipo de orçamento</Label>
+              <Select value={budgetType} onValueChange={(v) => setBudgetType(v as BudgetType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{objectives.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                <SelectContent>
+                  <SelectItem value="daily">Diário</SelectItem>
+                  <SelectItem value="total">Total</SelectItem>
+                </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5"><Label>Orçamento (R$)</Label><Input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} /></div>
+            <div className="space-y-1.5">
+              <Label>Orçamento {budgetType === "daily" ? "diário" : "total"} (R$)</Label>
+              <Input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} />
+            </div>
           </div>
           {campaign && (
             <>
