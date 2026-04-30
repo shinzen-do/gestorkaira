@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { User, Palette, Languages, LogOut, Save, Sun, Moon, Monitor } from "lucide-react";
+import { User, Palette, Languages, LogOut, Save, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,7 +84,6 @@ export default function SettingsPage() {
         <div className="flex gap-2">
           <ThemeBtn value="light" label={t("settings.theme.light")} icon={Sun} />
           <ThemeBtn value="dark" label={t("settings.theme.dark")} icon={Moon} />
-          <ThemeBtn value="system" label={t("settings.theme.system")} icon={Monitor} />
         </div>
       </Card>
 
