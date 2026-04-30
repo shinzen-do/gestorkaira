@@ -332,6 +332,80 @@ export type Database = {
           },
         ]
       }
+      daily_spends: {
+        Row: {
+          created_at: string
+          day: number
+          id: string
+          monthly_budget_id: string
+          recorded_at: string
+          spent_so_far: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: number
+          id?: string
+          monthly_budget_id: string
+          recorded_at?: string
+          spent_so_far?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: number
+          id?: string
+          monthly_budget_id?: string
+          recorded_at?: string
+          spent_so_far?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_spends_monthly_budget_id_fkey"
+            columns: ["monthly_budget_id"]
+            isOneToOne: false
+            referencedRelation: "monthly_budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      monthly_budgets: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          month: number
+          total_budget: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          month: number
+          total_budget?: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          month?: number
+          total_budget?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

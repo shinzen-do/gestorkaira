@@ -1,4 +1,4 @@
-import { Home, Users, History, Settings, Calendar, Target } from "lucide-react";
+import { Home, Users, History, Settings, Calendar, Target, Activity } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -16,6 +16,7 @@ export function KairaSidebar() {
     { title: t("nav.home"), url: "/dashboard", icon: Home },
     { title: t("nav.clients"), url: "/clients", icon: Users },
     { title: t("nav.audiences"), url: "/audiences", icon: Target },
+    { title: "Pacing", url: "/pacing", icon: Activity },
     { title: t("nav.calendar"), url: "/calendar", icon: Calendar },
     { title: t("nav.timeline"), url: "/timeline", icon: History },
   ];
