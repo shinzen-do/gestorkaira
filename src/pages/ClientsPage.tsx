@@ -35,8 +35,8 @@ function CreativeRow({ c, adSetId }: { c: Creative; adSetId: string }) {
         <StatusBadge status={c.status} />
       </div>
       <div className="flex items-center gap-3 text-[11px] text-muted-foreground shrink-0">
-        {c.ctr > 0 && <span>CTR {c.ctr}%</span>}
-        {c.impressions > 0 && <span>{c.impressions.toLocaleString()} impr.</span>}
+        {c.results > 0 && <span>{c.results.toLocaleString()} {c.result_label}</span>}
+        {c.cost_per_result > 0 && <span>R$ {c.cost_per_result.toFixed(2)} / result.</span>}
       </div>
       <div className="flex items-center gap-0.5 shrink-0">
         {c.url && (

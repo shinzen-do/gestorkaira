@@ -13,23 +13,30 @@ interface Props {
   creative?: Creative;
 }
 
+const RESULT_LABELS = ["conversas", "leads", "compras", "cadastros", "cliques no link", "instalações", "mensagens", "visualizações"];
+
 export function CreativeDialog({ trigger, adSetId, creative }: Props) {
   const { createCreative, updateCreative } = useAppData();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [format, setFormat] = useState<CreativeFormat>("image");
   const [url, setUrl] = useState("");
-  const [ctr, setCtr] = useState("0");
-  const [impressions, setImpressions] = useState("0");
+  const [results, setResults] = useState("0");
+  const [resultLabel, setResultLabel] = useState("conversas");
+  const [costPerResult, setCostPerResult] = useState("0");
   const [status, setStatus] = useState<"active" | "paused" | "archived">("active");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open && creative) {
       setName(creative.name); setFormat(creative.format); setUrl(creative.url ?? "");
-      setCtr(String(creative.ctr)); setImpressions(String(creative.impressions)); setStatus(creative.status);
+      setResults(String(creative.results ?? 0));
+      setResultLabel(creative.result_label ?? "conversas");
+      setCostPerResult(String(creative.cost_per_result ?? 0));
+      setStatus(creative.status);
     } else if (open) {
-      setName(""); setFormat("image"); setUrl(""); setCtr("0"); setImpressions("0"); setStatus("active");
+      setName(""); setFormat("image"); setUrl("");
+      setResults("0"); setResultLabel("conversas"); setCostPerResult("0"); setStatus("active");
     }
   }, [open, creative]);
 
@@ -40,11 +47,12 @@ export function CreativeDialog({ trigger, adSetId, creative }: Props) {
       if (creative) {
         await updateCreative(creative.id, {
           name: name.trim(), format, url: url.trim() || null,
-          ctr: Number(ctr) || 0, impressions: Number(impressions) || 0, status,
+          results: Number(results) || 0, result_label: resultLabel,
+          cost_per_result: Number(costPerResult) || 0, status,
         });
         toast.success("Criativo atualizado");
       } else {
-        await createCreative({ ad_set_id: adSetId, name: name.trim(), format, url: url.trim() || undefined });
+        await createCreative({ ad_set_id: adSetId, name: name.trim(), format, url: url.trim() || undefined, result_label: resultLabel });
         toast.success("Criativo criado");
       }
       setOpen(false);
@@ -83,9 +91,17 @@ export function CreativeDialog({ trigger, adSetId, creative }: Props) {
           </div>
           <div className="space-y-1.5"><Label>Link do criativo (URL)</Label><Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://drive.google.com/... ou https://..." /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label>CTR (%)</Label><Input type="number" step="0.01" value={ctr} onChange={(e) => setCtr(e.target.value)} /></div>
-            <div className="space-y-1.5"><Label>Impressões</Label><Input type="number" value={impressions} onChange={(e) => setImpressions(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label>Tipo de resultado</Label>
+              <Select value={resultLabel} onValueChange={setResultLabel}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {RESULT_LABELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5"><Label>Resultados (qtd.)</Label><Input type="number" value={results} onChange={(e) => setResults(e.target.value)} placeholder="Ex.: 25" /></div>
           </div>
+          <div className="space-y-1.5"><Label>Custo por resultado aprox. (R$)</Label><Input type="number" step="0.01" value={costPerResult} onChange={(e) => setCostPerResult(e.target.value)} placeholder="Ex.: 4.80" /></div>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>

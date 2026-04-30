@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAppData, type AdSet } from "@/contexts/AppDataContext";
+import { useAppData, type AdSet, type BudgetType } from "@/contexts/AppDataContext";
 import { toast } from "sonner";
 
 interface Props {
@@ -20,12 +20,17 @@ export function AdSetDialog({ trigger, campaignId, adSet }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [budget, setBudget] = useState("0");
+  const [budgetType, setBudgetType] = useState<BudgetType>("daily");
   const [status, setStatus] = useState<"active" | "paused" | "archived">("active");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (open && adSet) { setName(adSet.name); setBudget(String(adSet.budget)); setStatus(adSet.status); }
-    else if (open) { setName(""); setBudget("0"); setStatus("active"); }
+    if (open && adSet) {
+      setName(adSet.name); setBudget(String(adSet.budget));
+      setBudgetType(adSet.budget_type ?? "daily"); setStatus(adSet.status);
+    } else if (open) {
+      setName(""); setBudget("0"); setBudgetType("daily"); setStatus("active");
+    }
   }, [open, adSet]);
 
   const submit = async () => {
@@ -33,10 +38,10 @@ export function AdSetDialog({ trigger, campaignId, adSet }: Props) {
     setSaving(true);
     try {
       if (adSet) {
-        await updateAdSet(adSet.id, { name: name.trim(), budget: Number(budget) || 0, status });
+        await updateAdSet(adSet.id, { name: name.trim(), budget: Number(budget) || 0, budget_type: budgetType, status });
         toast.success("Conjunto atualizado");
       } else {
-        await createAdSet({ campaign_id: campaignId, name: name.trim(), budget: Number(budget) || 0 });
+        await createAdSet({ campaign_id: campaignId, name: name.trim(), budget: Number(budget) || 0, budget_type: budgetType });
         toast.success("Conjunto criado");
       }
       setOpen(false);
@@ -51,7 +56,21 @@ export function AdSetDialog({ trigger, campaignId, adSet }: Props) {
         <DialogHeader><DialogTitle>{adSet ? "Editar conjunto de anúncios" : "Novo conjunto de anúncios"}</DialogTitle></DialogHeader>
         <div className="space-y-3 py-2">
           <div className="space-y-1.5"><Label>Nome *</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex.: CA — Lookalike compradoras" /></div>
-          <div className="space-y-1.5"><Label>Orçamento (R$)</Label><Input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5"><Label>Tipo de orçamento</Label>
+              <Select value={budgetType} onValueChange={(v) => setBudgetType(v as BudgetType)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Diário</SelectItem>
+                  <SelectItem value="total">Total</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Orçamento {budgetType === "daily" ? "diário" : "total"} (R$)</Label>
+              <Input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} />
+            </div>
+          </div>
           {adSet && (
             <div className="space-y-1.5"><Label>Status</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
