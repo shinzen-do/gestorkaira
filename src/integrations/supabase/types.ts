@@ -17,6 +17,7 @@ export type Database = {
       ad_sets: {
         Row: {
           budget: number | null
+          budget_type: string
           campaign_id: string
           created_at: string
           id: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           budget?: number | null
+          budget_type?: string
           campaign_id: string
           created_at?: string
           id?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           budget?: number | null
+          budget_type?: string
           campaign_id?: string
           created_at?: string
           id?: string
@@ -184,6 +187,7 @@ export type Database = {
       campaigns: {
         Row: {
           budget: number | null
+          budget_type: string
           client_id: string
           created_at: string
           id: string
@@ -197,6 +201,7 @@ export type Database = {
         }
         Insert: {
           budget?: number | null
+          budget_type?: string
           client_id: string
           created_at?: string
           id?: string
@@ -210,6 +215,7 @@ export type Database = {
         }
         Update: {
           budget?: number | null
+          budget_type?: string
           client_id?: string
           created_at?: string
           id?: string
@@ -270,12 +276,15 @@ export type Database = {
       creatives: {
         Row: {
           ad_set_id: string
+          cost_per_result: number
           created_at: string
           ctr: number | null
           format: string
           id: string
           impressions: number | null
           name: string
+          result_label: string
+          results: number
           status: string
           updated_at: string
           url: string | null
@@ -283,12 +292,15 @@ export type Database = {
         }
         Insert: {
           ad_set_id: string
+          cost_per_result?: number
           created_at?: string
           ctr?: number | null
           format?: string
           id?: string
           impressions?: number | null
           name: string
+          result_label?: string
+          results?: number
           status?: string
           updated_at?: string
           url?: string | null
@@ -296,12 +308,15 @@ export type Database = {
         }
         Update: {
           ad_set_id?: string
+          cost_per_result?: number
           created_at?: string
           ctr?: number | null
           format?: string
           id?: string
           impressions?: number | null
           name?: string
+          result_label?: string
+          results?: number
           status?: string
           updated_at?: string
           url?: string | null
