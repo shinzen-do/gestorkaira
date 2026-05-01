@@ -214,7 +214,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       supabase.from("audiences").select("*").order("created_at", { ascending: false }),
       supabase.from("audience_campaigns").select("*"),
       supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }),
-      supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }),
+      supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }),
       supabase.from("calendar_notes").select("*").order("date", { ascending: true }),
     ]);
     setClients((c.data ?? []) as Client[]);
