@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Save, Calendar as CalendarIcon, Wallet, Activity } from "lucide-react";
+import { Loader2, Save, Calendar as CalendarIcon, Wallet, Activity, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
