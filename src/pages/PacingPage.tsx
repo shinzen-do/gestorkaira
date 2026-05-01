@@ -292,18 +292,50 @@ export default function PacingPage() {
 
                   {/* Métricas */}
                   {budget.total_budget > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <Stat label="Orçamento total" value={fmtBRL(budget.total_budget)} />
-                      <Stat label="Média por dia" value={fmtBRL(avgPerDay)} />
-                      <Stat
-                        label="Gasto até agora"
-                        value={latest ? fmtBRL(latest.spent_so_far) : "—"}
-                        sub={latest ? `Dia ${latest.day} de ${totalDays}` : "Sem registros"}
-                      />
-                      <Stat
-                        label="% gasto vs % mês"
-                        value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : "—"}
-                      />
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <Stat label="Orçamento total" value={fmtBRL(budget.total_budget)} />
+                        <Stat label="Média ideal/dia" value={fmtBRL(avgPerDay)} />
+                        <Stat
+                          label="Gasto até agora"
+                          value={latest ? fmtBRL(latest.spent_so_far) : "—"}
+                          sub={latest ? `Dia ${latest.day} de ${totalDays}` : "Sem registros"}
+                        />
+                        <Stat
+                          label="% gasto vs % mês"
+                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : "—"}
+                        />
+                      </div>
+
+                      {latest && daysElapsed > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <Stat
+                            label="Ritmo atual/dia"
+                            value={fmtBRL(dailyPaceSoFar)}
+                            sub={`${daysRemaining} ${daysRemaining === 1 ? "dia restante" : "dias restantes"}`}
+                          />
+                          <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3" /> Projeção fim do mês
+                            </div>
+                            <div className={`text-lg font-semibold mt-1 ${color.text}`}>{fmtBRL(projectedTotal)}</div>
+                            <div className="text-[11px] text-muted-foreground mt-0.5">
+                              {projectionPct.toFixed(1)}% do orçamento
+                            </div>
+                          </div>
+                          <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                              Diferença projetada
+                            </div>
+                            <div className={`text-lg font-semibold mt-1 ${color.text}`}>
+                              {projectionDelta > 0 ? "+" : ""}{fmtBRL(projectionDelta)}
+                            </div>
+                            <div className={`text-[11px] mt-0.5 ${color.text}`}>
+                              {projectionDelta > 0 ? "Vai estourar o orçamento" : projectionDelta < 0 ? "Vai sobrar orçamento" : "No alvo"}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
