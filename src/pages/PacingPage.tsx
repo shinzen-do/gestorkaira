@@ -373,18 +373,27 @@ export default function PacingPage() {
                   )}
 
                   {/* Atualização diária */}
-                  <div className="grid md:grid-cols-[120px_1fr_auto] gap-3 items-end p-4 rounded-xl bg-surface-2/40 border border-glass-border">
+                  <div className="grid md:grid-cols-[140px_1fr_auto] gap-3 items-end p-4 rounded-xl bg-surface-2/40 border border-glass-border">
                     <div className="space-y-2">
-                      <Label className="text-xs uppercase tracking-wider text-muted-foreground">Dia do mês</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={totalDays}
-                        placeholder={String(today.getDate())}
-                        value={dayInputs[budget.id] ?? ""}
-                        onChange={(e) => setDayInputs((p) => ({ ...p, [budget.id]: e.target.value }))}
-                        className="bg-background"
-                      />
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                        <CalendarIcon className="w-3.5 h-3.5" /> Dia do mês
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={totalDays}
+                          placeholder={String(effectiveDay)}
+                          value={dayInputs[budget.id] ?? String(effectiveDay)}
+                          onChange={(e) => setDayInputs((p) => ({ ...p, [budget.id]: e.target.value }))}
+                          className="bg-background pr-12"
+                        />
+                        {isCurrentMonth && (
+                          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-gold/90 bg-gold/10 px-1.5 py-0.5 rounded">
+                            hoje
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs uppercase tracking-wider text-muted-foreground">Total gasto no mês até esse dia</Label>
