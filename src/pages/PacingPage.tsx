@@ -226,11 +226,14 @@ export default function PacingPage() {
           {clients.map((client) => {
             const budget = budgets.find((b) => b.client_id === client.id);
             if (!budget) return null;
-            // Histórico ordenado por dia (mais recente do mês primeiro)
+            // Histórico ordenado por dia (maior dia do mês primeiro);
+            // em caso de empate no dia, o registro mais recente (recorded_at) vence.
             const clientSpends = spends
               .filter((s) => s.monthly_budget_id === budget.id)
-              .sort((a, b) => b.day - a.day);
-            // O "mais recente" é o de maior dia do mês (último registro feito ganha em caso de empate via recorded_at)
+              .sort((a, b) => {
+                if (b.day !== a.day) return b.day - a.day;
+                return new Date(b.recorded_at).getTime() - new Date(a.recorded_at).getTime();
+              });
             const latest = clientSpends[0];
             const avgPerDay = budget.total_budget > 0 ? budget.total_budget / totalDays : 0;
             const pctSpent = budget.total_budget > 0 && latest ? (latest.spent_so_far / budget.total_budget) * 100 : 0;
