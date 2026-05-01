@@ -88,6 +88,12 @@ export default function PacingPage() {
   const [dayInputs, setDayInputs] = useState<Record<string, string>>({}); // budget_id -> string
 
   const totalDays = daysInMonth(year, month);
+  // Dia "efetivo" do mês visualizado: se for o mês atual, usa o dia de hoje (atualizado em tempo real);
+  // se for um mês passado, usa o último dia do mês; se for futuro, usa o dia 1.
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
+  const isPastMonth =
+    year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth() + 1);
+  const effectiveDay = isCurrentMonth ? today.getDate() : isPastMonth ? totalDays : 1;
 
   const refresh = async () => {
     if (!user) return;
