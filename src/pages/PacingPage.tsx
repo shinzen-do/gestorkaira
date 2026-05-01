@@ -50,9 +50,33 @@ export default function PacingPage() {
   const { clients } = useAppData();
   const { toast } = useToast();
 
-  const today = new Date();
+  const [now, setNow] = useState(() => new Date());
+  const today = now;
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
+
+  // Atualiza o "agora" a cada minuto para que o dia atual fique sempre correto sem reload
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Detecta virada de dia/mês/ano e ajusta filtros automaticamente quando o usuário
+  // está visualizando o mês corrente
+  useEffect(() => {
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth() + 1;
+    setYear((y) => (y === curYear || y === curYear - 1 ? curYear : y));
+    setMonth((m) => {
+      // Se o usuário estava no mês "atual" anterior, avança junto
+      const prevDate = new Date(year, month - 1, 1);
+      const isViewingCurrent =
+        prevDate.getFullYear() === curYear && prevDate.getMonth() + 1 === curMonth;
+      return isViewingCurrent ? curMonth : m;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [now]);
+
   const [budgets, setBudgets] = useState<MonthlyBudget[]>([]);
   const [spends, setSpends] = useState<DailySpend[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +88,12 @@ export default function PacingPage() {
   const [dayInputs, setDayInputs] = useState<Record<string, string>>({}); // budget_id -> string
 
   const totalDays = daysInMonth(year, month);
+  // Dia "efetivo" do mês visualizado: se for o mês atual, usa o dia de hoje (atualizado em tempo real);
+  // se for um mês passado, usa o último dia do mês; se for futuro, usa o dia 1.
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
+  const isPastMonth =
+    year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth() + 1);
+  const effectiveDay = isCurrentMonth ? today.getDate() : isPastMonth ? totalDays : 1;
 
   const refresh = async () => {
     if (!user) return;
@@ -123,7 +153,7 @@ export default function PacingPage() {
 
   const saveSpend = async (budgetId: string) => {
     if (!user) return;
-    const day = parseInt(dayInputs[budgetId] ?? String(today.getDate()));
+    const day = parseInt(dayInputs[budgetId] ?? String(effectiveDay));
     const spent = parseFloat(spentInputs[budgetId] ?? "");
     if (isNaN(day) || day < 1 || day > totalDays) {
       toast({ title: "Dia inválido", description: `Use um número entre 1 e ${totalDays}.`, variant: "destructive" });
@@ -343,18 +373,27 @@ export default function PacingPage() {
                   )}
 
                   {/* Atualização diária */}
-                  <div className="grid md:grid-cols-[120px_1fr_auto] gap-3 items-end p-4 rounded-xl bg-surface-2/40 border border-glass-border">
+                  <div className="grid md:grid-cols-[140px_1fr_auto] gap-3 items-end p-4 rounded-xl bg-surface-2/40 border border-glass-border">
                     <div className="space-y-2">
-                      <Label className="text-xs uppercase tracking-wider text-muted-foreground">Dia do mês</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={totalDays}
-                        placeholder={String(today.getDate())}
-                        value={dayInputs[budget.id] ?? ""}
-                        onChange={(e) => setDayInputs((p) => ({ ...p, [budget.id]: e.target.value }))}
-                        className="bg-background"
-                      />
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                        <CalendarIcon className="w-3.5 h-3.5" /> Dia do mês
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={totalDays}
+                          placeholder={String(effectiveDay)}
+                          value={dayInputs[budget.id] ?? String(effectiveDay)}
+                          onChange={(e) => setDayInputs((p) => ({ ...p, [budget.id]: e.target.value }))}
+                          className="bg-background pr-12"
+                        />
+                        {isCurrentMonth && (
+                          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-gold/90 bg-gold/10 px-1.5 py-0.5 rounded">
+                            hoje
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs uppercase tracking-wider text-muted-foreground">Total gasto no mês até esse dia</Label>
