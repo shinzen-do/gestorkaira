@@ -153,7 +153,7 @@ export default function PacingPage() {
 
   const saveSpend = async (budgetId: string) => {
     if (!user) return;
-    const day = parseInt(dayInputs[budgetId] ?? String(today.getDate()));
+    const day = parseInt(dayInputs[budgetId] ?? String(effectiveDay));
     const spent = parseFloat(spentInputs[budgetId] ?? "");
     if (isNaN(day) || day < 1 || day > totalDays) {
       toast({ title: "Dia inválido", description: `Use um número entre 1 e ${totalDays}.`, variant: "destructive" });
