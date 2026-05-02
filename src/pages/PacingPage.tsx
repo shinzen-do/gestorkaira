@@ -266,18 +266,20 @@ export default function PacingPage() {
               });
             const latest = clientSpends[0];
             const avgPerDay = budget.total_budget > 0 ? budget.total_budget / totalDays : 0;
+            // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
+            const referenceDay = effectiveDay;
             const pctSpent = budget.total_budget > 0 && latest ? (latest.spent_so_far / budget.total_budget) * 100 : 0;
-            const pctMonth = latest ? (latest.day / totalDays) * 100 : 0;
-            const diff = pctSpent - pctMonth;
+            const pctMonth = (referenceDay / totalDays) * 100;
+            const diff = latest ? pctSpent - pctMonth : 0;
             const color = pacingColor(diff);
 
-            // Projeção: assume que o ritmo médio diário até agora se mantém pelo resto do mês
-            const daysElapsed = latest ? latest.day : 0;
+            // Projeção baseada no dia REAL atual, não no dia do último registro
+            const daysElapsed = referenceDay;
             const daysRemaining = Math.max(0, totalDays - daysElapsed);
             const dailyPaceSoFar = latest && daysElapsed > 0 ? latest.spent_so_far / daysElapsed : 0;
-            const projectedTotal = latest ? latest.spent_so_far + dailyPaceSoFar * daysRemaining : 0;
-            const projectionDelta = budget.total_budget > 0 ? projectedTotal - budget.total_budget : 0;
-            const projectionPct = budget.total_budget > 0 ? (projectedTotal / budget.total_budget) * 100 : 0;
+            const projectedTotal = latest ? dailyPaceSoFar * totalDays : 0;
+            const projectionDelta = budget.total_budget > 0 && latest ? projectedTotal - budget.total_budget : 0;
+            const projectionPct = budget.total_budget > 0 && latest ? (projectedTotal / budget.total_budget) * 100 : 0;
 
             return (
               <Card key={client.id} className="glass-card">
@@ -332,11 +334,11 @@ export default function PacingPage() {
                         <Stat
                           label="Gasto até agora"
                           value={latest ? fmtBRL(latest.spent_so_far) : "—"}
-                          sub={latest ? `Dia ${latest.day} de ${totalDays}` : "Sem registros"}
+                          sub={latest ? `Registro do dia ${latest.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
                           label="% gasto vs % mês"
-                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : "—"}
+                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
                         />
                       </div>
 
@@ -345,7 +347,7 @@ export default function PacingPage() {
                           <Stat
                             label="Ritmo atual/dia"
                             value={fmtBRL(dailyPaceSoFar)}
-                            sub={`${daysRemaining} ${daysRemaining === 1 ? "dia restante" : "dias restantes"}`}
+                            sub={`Baseado em ${daysElapsed} ${daysElapsed === 1 ? "dia" : "dias"} · ${daysRemaining} ${daysRemaining === 1 ? "restante" : "restantes"}`}
                           />
                           <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
                             <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
