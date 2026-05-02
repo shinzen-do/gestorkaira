@@ -38,6 +38,11 @@ const daysInMonth = (year: number, month: number) => new Date(year, month, 0).ge
 const fmtBRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
 
+const parseAmount = (value: string) => {
+  const normalized = value.trim().replace(",", ".");
+  return normalized ? Number(normalized) : NaN;
+};
+
 function pacingColor(diff: number) {
   // diff = % gasto - % do mês passado. -3 a +3 = verde, < -3 = amarelo, > 3 = laranja
   if (diff < -3) return { bg: "bg-yellow-500/15", text: "text-yellow-500", ring: "ring-yellow-500/40", label: "Abaixo do ritmo" };
@@ -134,7 +139,7 @@ export default function PacingPage() {
   const saveBudget = async (clientId: string) => {
     const b = budgets.find((x) => x.client_id === clientId);
     if (!b || !user) return;
-    const value = parseFloat(budgetInputs[clientId] ?? String(b.total_budget));
+    const value = parseAmount(budgetInputs[clientId] ?? String(b.total_budget));
     if (isNaN(value) || value < 0) {
       toast({ title: "Valor inválido", variant: "destructive" });
       return;
@@ -154,7 +159,7 @@ export default function PacingPage() {
   const saveSpend = async (budgetId: string) => {
     if (!user) return;
     const day = parseInt(dayInputs[budgetId] ?? String(effectiveDay));
-    const spent = parseFloat(spentInputs[budgetId] ?? "");
+    const spent = parseAmount(spentInputs[budgetId] ?? "");
     if (isNaN(day) || day < 1 || day > totalDays) {
       toast({ title: "Dia inválido", description: `Use um número entre 1 e ${totalDays}.`, variant: "destructive" });
       return;
