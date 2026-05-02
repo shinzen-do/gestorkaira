@@ -347,7 +347,7 @@ export default function PacingPage() {
                           <Stat
                             label="Ritmo atual/dia"
                             value={fmtBRL(dailyPaceSoFar)}
-                            sub={`${daysRemaining} ${daysRemaining === 1 ? "dia restante" : "dias restantes"}`}
+                            sub={`Baseado em ${daysElapsed} ${daysElapsed === 1 ? "dia" : "dias"} · ${daysRemaining} ${daysRemaining === 1 ? "restante" : "restantes"}`}
                           />
                           <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
                             <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
