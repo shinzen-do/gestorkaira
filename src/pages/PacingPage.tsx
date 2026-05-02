@@ -270,21 +270,23 @@ export default function PacingPage() {
                 return new Date(b.recorded_at).getTime() - new Date(a.recorded_at).getTime();
               });
             const latest = clientSpends[0];
+            const pendingSpent = parseAmount(spentInputs[budget.id] ?? "");
+            const previewSpend = !isNaN(pendingSpent) && pendingSpent >= 0 ? pendingSpent : latest?.spent_so_far;
             const avgPerDay = budget.total_budget > 0 ? budget.total_budget / totalDays : 0;
             // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
             const referenceDay = effectiveDay;
-            const pctSpent = budget.total_budget > 0 && latest ? (latest.spent_so_far / budget.total_budget) * 100 : 0;
+            const pctSpent = budget.total_budget > 0 && previewSpend !== undefined ? (previewSpend / budget.total_budget) * 100 : 0;
             const pctMonth = (referenceDay / totalDays) * 100;
-            const diff = latest ? pctSpent - pctMonth : 0;
+            const diff = previewSpend !== undefined ? pctSpent - pctMonth : 0;
             const color = pacingColor(diff);
 
             // Projeção baseada no dia REAL atual, não no dia do último registro
             const daysElapsed = referenceDay;
             const daysRemaining = Math.max(0, totalDays - daysElapsed);
-            const dailyPaceSoFar = latest && daysElapsed > 0 ? latest.spent_so_far / daysElapsed : 0;
-            const projectedTotal = latest ? dailyPaceSoFar * totalDays : 0;
-            const projectionDelta = budget.total_budget > 0 && latest ? projectedTotal - budget.total_budget : 0;
-            const projectionPct = budget.total_budget > 0 && latest ? (projectedTotal / budget.total_budget) * 100 : 0;
+            const dailyPaceSoFar = previewSpend !== undefined && daysElapsed > 0 ? previewSpend / daysElapsed : 0;
+            const projectedTotal = previewSpend !== undefined ? dailyPaceSoFar * totalDays : 0;
+            const projectionDelta = budget.total_budget > 0 && previewSpend !== undefined ? projectedTotal - budget.total_budget : 0;
+            const projectionPct = budget.total_budget > 0 && previewSpend !== undefined ? (projectedTotal / budget.total_budget) * 100 : 0;
 
             return (
               <Card key={client.id} className="glass-card">
@@ -296,7 +298,7 @@ export default function PacingPage() {
                         <p className="text-xs text-muted-foreground mt-0.5">{client.industry}</p>
                       )}
                     </div>
-                    {budget.total_budget > 0 && latest && (
+                    {budget.total_budget > 0 && previewSpend !== undefined && (
                       <div className={`px-4 py-2 rounded-xl ring-1 ${color.bg} ${color.ring}`}>
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Pacing</div>
                         <div className={`text-2xl font-bold ${color.text}`}>
@@ -338,16 +340,16 @@ export default function PacingPage() {
                         <Stat label="Média ideal/dia" value={fmtBRL(avgPerDay)} />
                         <Stat
                           label="Gasto até agora"
-                          value={latest ? fmtBRL(latest.spent_so_far) : "—"}
-                          sub={latest ? `Registro do dia ${latest.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
+                          value={previewSpend !== undefined ? fmtBRL(previewSpend) : "—"}
+                          sub={previewSpend !== undefined ? `${!isNaN(pendingSpent) && pendingSpent >= 0 ? "Prévia digitada" : `Registro do dia ${latest?.day}`} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
                           label="% gasto vs % mês"
-                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
+                          value={previewSpend !== undefined ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
                         />
                       </div>
 
-                      {latest && daysElapsed > 0 && (
+                      {previewSpend !== undefined && daysElapsed > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <Stat
                             label="Ritmo atual/dia"
