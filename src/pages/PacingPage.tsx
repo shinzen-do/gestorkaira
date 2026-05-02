@@ -334,11 +334,11 @@ export default function PacingPage() {
                         <Stat
                           label="Gasto até agora"
                           value={latest ? fmtBRL(latest.spent_so_far) : "—"}
-                          sub={latest ? `Dia ${latest.day} de ${totalDays}` : "Sem registros"}
+                          sub={latest ? `Registro do dia ${latest.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
                           label="% gasto vs % mês"
-                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : "—"}
+                          value={latest ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
                         />
                       </div>
 
