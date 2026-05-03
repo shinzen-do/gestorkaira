@@ -306,7 +306,7 @@ export default function PacingPage() {
                         <p className="text-xs text-muted-foreground mt-0.5">{client.industry}</p>
                       )}
                     </div>
-                    {budget.total_budget > 0 && previewSpend !== undefined && (
+                    {previewBudget > 0 && previewSpend !== undefined && (
                       <div className={`px-4 py-2 rounded-xl ring-1 ${color.bg} ${color.ring}`}>
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Pacing</div>
                         <div className={`text-2xl font-bold ${color.text}`}>
@@ -341,10 +341,10 @@ export default function PacingPage() {
                   </div>
 
                   {/* Métricas */}
-                  {budget.total_budget > 0 && (
+                  {previewBudget > 0 && (
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <Stat label="Orçamento total" value={fmtBRL(budget.total_budget)} />
+                        <Stat label="Orçamento total" value={fmtBRL(previewBudget)} />
                         <Stat label="Média ideal/dia" value={fmtBRL(avgPerDay)} />
                         <Stat
                           label="Gasto até agora"
