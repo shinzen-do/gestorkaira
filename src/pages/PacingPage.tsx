@@ -39,7 +39,12 @@ const fmtBRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
 
 const parseAmount = (value: string) => {
-  const normalized = value.trim().replace(",", ".");
+  const raw = value.trim().replace(/\s/g, "").replace(/[^\d,.-]/g, "");
+  const lastComma = raw.lastIndexOf(",");
+  const lastDot = raw.lastIndexOf(".");
+  const normalized = lastComma > lastDot
+    ? raw.replace(/\./g, "").replace(",", ".")
+    : raw.replace(/,/g, "");
   return normalized ? Number(normalized) : NaN;
 };
 
@@ -261,21 +266,25 @@ export default function PacingPage() {
           {clients.map((client) => {
             const budget = budgets.find((b) => b.client_id === client.id);
             if (!budget) return null;
-            // Usa sempre o registro atualizado mais recentemente para recalcular os percentuais imediatamente.
+            // Usa o maior dia registrado como referência do acumulado; em caso de empate, pega a edição mais recente.
             const clientSpends = spends
               .filter((s) => s.monthly_budget_id === budget.id)
               .sort((a, b) => {
+                const dayDiff = b.day - a.day;
+                if (dayDiff !== 0) return dayDiff;
                 const recordedDiff = new Date(b.recorded_at).getTime() - new Date(a.recorded_at).getTime();
-                return recordedDiff !== 0 ? recordedDiff : b.day - a.day;
+                return recordedDiff;
               });
             const latest = clientSpends[0];
+            const pendingBudget = parseAmount(budgetInputs[client.id] ?? "");
+            const previewBudget = !isNaN(pendingBudget) && pendingBudget >= 0 ? pendingBudget : budget.total_budget;
             const pendingSpent = parseAmount(spentInputs[budget.id] ?? "");
             const previewSpend = !isNaN(pendingSpent) && pendingSpent >= 0 ? pendingSpent : latest?.spent_so_far;
-            const avgPerDay = budget.total_budget > 0 ? budget.total_budget / totalDays : 0;
+            const avgPerDay = previewBudget > 0 ? previewBudget / totalDays : 0;
             // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
             const referenceDay = effectiveDay;
-            const pctSpent = budget.total_budget > 0 && previewSpend !== undefined ? (previewSpend / budget.total_budget) * 100 : 0;
-            const pctMonth = (referenceDay / totalDays) * 100;
+            const pctSpent = previewBudget > 0 && previewSpend !== undefined ? (previewSpend / previewBudget) * 100 : 0;
+            const pctMonth = Math.min(100, Math.max(0, (referenceDay / totalDays) * 100));
             const diff = previewSpend !== undefined ? pctSpent - pctMonth : 0;
             const color = pacingColor(diff);
 
@@ -284,8 +293,8 @@ export default function PacingPage() {
             const daysRemaining = Math.max(0, totalDays - daysElapsed);
             const dailyPaceSoFar = previewSpend !== undefined && daysElapsed > 0 ? previewSpend / daysElapsed : 0;
             const projectedTotal = previewSpend !== undefined ? dailyPaceSoFar * totalDays : 0;
-            const projectionDelta = budget.total_budget > 0 && previewSpend !== undefined ? projectedTotal - budget.total_budget : 0;
-            const projectionPct = budget.total_budget > 0 && previewSpend !== undefined ? (projectedTotal / budget.total_budget) * 100 : 0;
+            const projectionDelta = previewBudget > 0 && previewSpend !== undefined ? projectedTotal - previewBudget : 0;
+            const projectionPct = previewBudget > 0 && previewSpend !== undefined ? (projectedTotal / previewBudget) * 100 : 0;
 
             return (
               <Card key={client.id} className="glass-card">
