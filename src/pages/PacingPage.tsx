@@ -358,13 +358,14 @@ export default function PacingPage() {
                         <Stat label="Orçamento total" value={fmtBRL(previewBudget)} />
                         <Stat label="Média ideal/dia" value={fmtBRL(avgPerDay)} />
                         <Stat
-                          label="Gasto até agora"
+                          label="Gasto até o último registro"
                           value={previewSpend !== undefined ? fmtBRL(previewSpend) : "—"}
-                          sub={previewSpend !== undefined ? `Registro do dia ${latest?.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
+                          sub={previewSpend !== undefined ? `Último registro: dia ${latest?.day}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
-                          label="% gasto vs % mês"
+                          label="% gasto vs % do mês"
                           value={previewSpend !== undefined ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
+                          sub={previewSpend !== undefined ? `Referência: dia ${referenceDay}` : undefined}
                         />
                       </div>
 
