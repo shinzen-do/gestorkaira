@@ -276,10 +276,9 @@ export default function PacingPage() {
                 return recordedDiff;
               });
             const latest = clientSpends[0];
-            const pendingBudget = parseAmount(budgetInputs[client.id] ?? "");
-            const previewBudget = !isNaN(pendingBudget) && pendingBudget >= 0 ? pendingBudget : budget.total_budget;
-            const pendingSpent = parseAmount(spentInputs[budget.id] ?? "");
-            const previewSpend = !isNaN(pendingSpent) && pendingSpent >= 0 ? pendingSpent : latest?.spent_so_far;
+            // Mostra SEMPRE o último valor salvo (não usa prévia digitada).
+            const previewBudget = budget.total_budget;
+            const previewSpend = latest?.spent_so_far;
             const avgPerDay = previewBudget > 0 ? previewBudget / totalDays : 0;
             // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
             const referenceDay = effectiveDay;
@@ -349,7 +348,7 @@ export default function PacingPage() {
                         <Stat
                           label="Gasto até agora"
                           value={previewSpend !== undefined ? fmtBRL(previewSpend) : "—"}
-                          sub={previewSpend !== undefined ? `${!isNaN(pendingSpent) && pendingSpent >= 0 ? "Prévia digitada" : `Registro do dia ${latest?.day}`} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
+                          sub={previewSpend !== undefined ? `Registro do dia ${latest?.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
                           label="% gasto vs % mês"
