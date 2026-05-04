@@ -280,20 +280,32 @@ export default function PacingPage() {
             const previewBudget = budget.total_budget;
             const previewSpend = latest?.spent_so_far;
             const avgPerDay = previewBudget > 0 ? previewBudget / totalDays : 0;
-            // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
-            const referenceDay = effectiveDay;
+            // TODAS as métricas usam o dia do último registro como referência.
+            const referenceDay = latest?.day ?? effectiveDay;
             const pctSpent = previewBudget > 0 && previewSpend !== undefined ? (previewSpend / previewBudget) * 100 : 0;
             const pctMonth = Math.min(100, Math.max(0, (referenceDay / totalDays) * 100));
             const diff = previewSpend !== undefined ? pctSpent - pctMonth : 0;
             const color = pacingColor(diff);
 
-            // Projeção baseada no dia REAL atual, não no dia do último registro
+            // Projeções baseadas no dia do ÚLTIMO REGISTRO (não no dia real de hoje)
             const daysElapsed = referenceDay;
             const daysRemaining = Math.max(0, totalDays - daysElapsed);
             const dailyPaceSoFar = previewSpend !== undefined && daysElapsed > 0 ? previewSpend / daysElapsed : 0;
             const projectedTotal = previewSpend !== undefined ? dailyPaceSoFar * totalDays : 0;
             const projectionDelta = previewBudget > 0 && previewSpend !== undefined ? projectedTotal - previewBudget : 0;
             const projectionPct = previewBudget > 0 && previewSpend !== undefined ? (projectedTotal / previewBudget) * 100 : 0;
+
+            // Quando o orçamento acabaria mantendo o ritmo atual
+            const budgetRemaining = previewBudget > 0 && previewSpend !== undefined ? previewBudget - previewSpend : 0;
+            const daysUntilEmpty = dailyPaceSoFar > 0 && budgetRemaining > 0 ? budgetRemaining / dailyPaceSoFar : 0;
+            const totalDaysToEmpty = dailyPaceSoFar > 0 ? previewBudget / dailyPaceSoFar : 0;
+            const exhaustDayOfMonth = referenceDay + daysUntilEmpty; // dia do mês em que zera
+            const exhaustDate = dailyPaceSoFar > 0 && previewSpend !== undefined && budgetRemaining > 0
+              ? new Date(year, month - 1, 1 + Math.floor(exhaustDayOfMonth) - 1)
+              : null;
+            const alreadyExhausted = previewSpend !== undefined && previewBudget > 0 && previewSpend >= previewBudget;
+            const willExhaustBeforeMonthEnds = exhaustDayOfMonth > 0 && exhaustDayOfMonth <= totalDays && !alreadyExhausted;
+            const fmtDate = (d: Date) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
             return (
               <Card key={client.id} className="glass-card">
