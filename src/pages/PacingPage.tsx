@@ -370,11 +370,11 @@ export default function PacingPage() {
                       </div>
 
                       {previewSpend !== undefined && daysElapsed > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                           <Stat
                             label="Ritmo atual/dia"
                             value={fmtBRL(dailyPaceSoFar)}
-                            sub={`Baseado em ${daysElapsed} ${daysElapsed === 1 ? "dia" : "dias"} · ${daysRemaining} ${daysRemaining === 1 ? "restante" : "restantes"}`}
+                            sub={`Baseado no último registro (dia ${referenceDay}) · ${daysRemaining} ${daysRemaining === 1 ? "dia restante" : "dias restantes"}`}
                           />
                           <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
                             <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -395,6 +395,33 @@ export default function PacingPage() {
                             <div className={`text-[11px] mt-0.5 ${color.text}`}>
                               {projectionDelta > 0 ? "Vai estourar o orçamento" : projectionDelta < 0 ? "Vai sobrar orçamento" : "No alvo"}
                             </div>
+                          </div>
+                          <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                              <CalendarIcon className="w-3 h-3" /> Orçamento acaba em
+                            </div>
+                            {alreadyExhausted ? (
+                              <>
+                                <div className={`text-lg font-semibold mt-1 ${color.text}`}>Já estourou</div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">
+                                  {fmtBRL(previewSpend - previewBudget)} acima do orçamento
+                                </div>
+                              </>
+                            ) : dailyPaceSoFar <= 0 ? (
+                              <>
+                                <div className="text-lg font-semibold mt-1">—</div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">Sem ritmo de gasto</div>
+                              </>
+                            ) : (
+                              <>
+                                <div className={`text-lg font-semibold mt-1 ${color.text}`}>
+                                  {exhaustDate ? fmtDate(exhaustDate) : `Dia ${Math.ceil(exhaustDayOfMonth)}`}
+                                </div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">
+                                  Em ~{Math.ceil(daysUntilEmpty)} {Math.ceil(daysUntilEmpty) === 1 ? "dia" : "dias"} ({totalDaysToEmpty.toFixed(1)}d no total · {willExhaustBeforeMonthEnds ? "antes do fim do mês" : "depois do fim do mês"})
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
