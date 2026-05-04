@@ -13,6 +13,7 @@ import {
   Activity,
   ArrowRight,
 } from "lucide-react";
+import { KairaK } from "@/components/shared/KairaK";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
