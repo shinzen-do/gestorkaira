@@ -280,20 +280,32 @@ export default function PacingPage() {
             const previewBudget = budget.total_budget;
             const previewSpend = latest?.spent_so_far;
             const avgPerDay = previewBudget > 0 ? previewBudget / totalDays : 0;
-            // Dia de referência: dia real de hoje (mês atual), último dia (mês passado) ou dia 1 (mês futuro)
-            const referenceDay = effectiveDay;
+            // TODAS as métricas usam o dia do último registro como referência.
+            const referenceDay = latest?.day ?? effectiveDay;
             const pctSpent = previewBudget > 0 && previewSpend !== undefined ? (previewSpend / previewBudget) * 100 : 0;
             const pctMonth = Math.min(100, Math.max(0, (referenceDay / totalDays) * 100));
             const diff = previewSpend !== undefined ? pctSpent - pctMonth : 0;
             const color = pacingColor(diff);
 
-            // Projeção baseada no dia REAL atual, não no dia do último registro
+            // Projeções baseadas no dia do ÚLTIMO REGISTRO (não no dia real de hoje)
             const daysElapsed = referenceDay;
             const daysRemaining = Math.max(0, totalDays - daysElapsed);
             const dailyPaceSoFar = previewSpend !== undefined && daysElapsed > 0 ? previewSpend / daysElapsed : 0;
             const projectedTotal = previewSpend !== undefined ? dailyPaceSoFar * totalDays : 0;
             const projectionDelta = previewBudget > 0 && previewSpend !== undefined ? projectedTotal - previewBudget : 0;
             const projectionPct = previewBudget > 0 && previewSpend !== undefined ? (projectedTotal / previewBudget) * 100 : 0;
+
+            // Quando o orçamento acabaria mantendo o ritmo atual
+            const budgetRemaining = previewBudget > 0 && previewSpend !== undefined ? previewBudget - previewSpend : 0;
+            const daysUntilEmpty = dailyPaceSoFar > 0 && budgetRemaining > 0 ? budgetRemaining / dailyPaceSoFar : 0;
+            const totalDaysToEmpty = dailyPaceSoFar > 0 ? previewBudget / dailyPaceSoFar : 0;
+            const exhaustDayOfMonth = referenceDay + daysUntilEmpty; // dia do mês em que zera
+            const exhaustDate = dailyPaceSoFar > 0 && previewSpend !== undefined && budgetRemaining > 0
+              ? new Date(year, month - 1, 1 + Math.floor(exhaustDayOfMonth) - 1)
+              : null;
+            const alreadyExhausted = previewSpend !== undefined && previewBudget > 0 && previewSpend >= previewBudget;
+            const willExhaustBeforeMonthEnds = exhaustDayOfMonth > 0 && exhaustDayOfMonth <= totalDays && !alreadyExhausted;
+            const fmtDate = (d: Date) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
             return (
               <Card key={client.id} className="glass-card">
@@ -346,22 +358,23 @@ export default function PacingPage() {
                         <Stat label="Orçamento total" value={fmtBRL(previewBudget)} />
                         <Stat label="Média ideal/dia" value={fmtBRL(avgPerDay)} />
                         <Stat
-                          label="Gasto até agora"
+                          label="Gasto até o último registro"
                           value={previewSpend !== undefined ? fmtBRL(previewSpend) : "—"}
-                          sub={previewSpend !== undefined ? `Registro do dia ${latest?.day} · hoje é dia ${referenceDay}/${totalDays}` : "Sem registros"}
+                          sub={previewSpend !== undefined ? `Último registro: dia ${latest?.day}/${totalDays}` : "Sem registros"}
                         />
                         <Stat
-                          label="% gasto vs % mês"
+                          label="% gasto vs % do mês"
                           value={previewSpend !== undefined ? `${pctSpent.toFixed(1)}% / ${pctMonth.toFixed(1)}%` : `— / ${pctMonth.toFixed(1)}%`}
+                          sub={previewSpend !== undefined ? `Referência: dia ${referenceDay}` : undefined}
                         />
                       </div>
 
                       {previewSpend !== undefined && daysElapsed > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                           <Stat
                             label="Ritmo atual/dia"
                             value={fmtBRL(dailyPaceSoFar)}
-                            sub={`Baseado em ${daysElapsed} ${daysElapsed === 1 ? "dia" : "dias"} · ${daysRemaining} ${daysRemaining === 1 ? "restante" : "restantes"}`}
+                            sub={`Baseado no último registro (dia ${referenceDay}) · ${daysRemaining} ${daysRemaining === 1 ? "dia restante" : "dias restantes"}`}
                           />
                           <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
                             <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -382,6 +395,33 @@ export default function PacingPage() {
                             <div className={`text-[11px] mt-0.5 ${color.text}`}>
                               {projectionDelta > 0 ? "Vai estourar o orçamento" : projectionDelta < 0 ? "Vai sobrar orçamento" : "No alvo"}
                             </div>
+                          </div>
+                          <div className={`p-3 rounded-lg border ${color.ring} ${color.bg}`}>
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                              <CalendarIcon className="w-3 h-3" /> Orçamento acaba em
+                            </div>
+                            {alreadyExhausted ? (
+                              <>
+                                <div className={`text-lg font-semibold mt-1 ${color.text}`}>Já estourou</div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">
+                                  {fmtBRL(previewSpend - previewBudget)} acima do orçamento
+                                </div>
+                              </>
+                            ) : dailyPaceSoFar <= 0 ? (
+                              <>
+                                <div className="text-lg font-semibold mt-1">—</div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">Sem ritmo de gasto</div>
+                              </>
+                            ) : (
+                              <>
+                                <div className={`text-lg font-semibold mt-1 ${color.text}`}>
+                                  {exhaustDate ? fmtDate(exhaustDate) : `Dia ${Math.ceil(exhaustDayOfMonth)}`}
+                                </div>
+                                <div className="text-[11px] text-muted-foreground mt-0.5">
+                                  Em ~{Math.ceil(daysUntilEmpty)} {Math.ceil(daysUntilEmpty) === 1 ? "dia" : "dias"} ({totalDaysToEmpty.toFixed(1)}d no total · {willExhaustBeforeMonthEnds ? "antes do fim do mês" : "depois do fim do mês"})
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
