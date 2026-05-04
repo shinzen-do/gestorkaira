@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Zap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { KairaK } from "@/components/shared/KairaK";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +67,7 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-10 h-10 rounded-xl bg-cobalt/20 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-cobalt" />
+              <KairaK className="w-5 h-5 text-cobalt" />
             </div>
           </Link>
           <h1 className="text-2xl font-bold tracking-tight">Crie sua conta</h1>

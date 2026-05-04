@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
-  Zap,
   Loader2,
   Eye,
   EyeOff,
@@ -124,7 +123,7 @@ export default function LoginPage() {
 
         <Link to="/" className="inline-flex items-center gap-3 relative z-10 group">
           <div className="w-10 h-10 rounded-xl bg-cobalt/15 border border-cobalt/30 flex items-center justify-center group-hover:bg-cobalt/25 transition-colors">
-            <Zap className="w-5 h-5 text-cobalt" />
+            <KairaK className="w-5 h-5 text-cobalt" />
           </div>
           <span className="text-xl font-semibold tracking-tight">Kaira</span>
         </Link>
@@ -187,7 +186,7 @@ export default function LoginPage() {
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-cobalt/20 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-cobalt" />
+                <KairaK className="w-5 h-5 text-cobalt" />
               </div>
               <span className="text-xl font-semibold">Kaira</span>
             </Link>
