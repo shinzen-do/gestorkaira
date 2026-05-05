@@ -128,18 +128,32 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
 }
 
 export default function CalendarPage() {
-  const { calendarNotes, toggleCalendarNote, deleteCalendarNote, clients, audiences, campaigns, timelineEntries } = useAppData();
+  const { calendarNotes, toggleCalendarNote, deleteCalendarNote, clients, audiences, campaigns, timelineEntries, plannedCampaigns } = useAppData();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
   const today = startOfDay(new Date());
 
   const noteDates = useMemo(() => calendarNotes.filter((n) => !n.done).map((n) => parseISO(n.date)), [calendarNotes]);
   const changeDates = useMemo(() => timelineEntries.map((t) => parseISO(t.occurred_at)), [timelineEntries]);
+  const plannedDates = useMemo(() =>
+    plannedCampaigns.filter((p) => p.status !== "cancelled").flatMap((p) => [parseISO(p.start_date), parseISO(p.end_date)]),
+  [plannedCampaigns]);
 
   const notesForSelected = useMemo(() => {
     if (!selectedDate) return [];
     return calendarNotes.filter((n) => isSameDay(parseISO(n.date), selectedDate));
   }, [calendarNotes, selectedDate]);
+
+  const plannedForSelected = useMemo(() => {
+    if (!selectedDate) return [] as { kind: "start" | "end"; p: typeof plannedCampaigns[number] }[];
+    const out: { kind: "start" | "end"; p: typeof plannedCampaigns[number] }[] = [];
+    plannedCampaigns.forEach((p) => {
+      if (p.status === "cancelled") return;
+      if (isSameDay(parseISO(p.start_date), selectedDate)) out.push({ kind: "start", p });
+      if (isSameDay(parseISO(p.end_date), selectedDate)) out.push({ kind: "end", p });
+    });
+    return out;
+  }, [plannedCampaigns, selectedDate]);
 
   const changesForSelected = useMemo(() => {
     if (!selectedDate) return [];
