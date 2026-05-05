@@ -237,10 +237,11 @@ export default function CalendarPage() {
         <div className="lg:col-span-1 space-y-4">
           <div className="glass-card p-4">
             <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} locale={ptBR}
-              modifiers={{ hasNote: noteDates, hasChange: changeDates }}
+              modifiers={{ hasNote: noteDates, hasChange: changeDates, hasPlanned: plannedDates }}
               modifiersClassNames={{
                 hasNote: "relative font-semibold text-gold",
                 hasChange: "after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:rounded-full after:bg-cobalt",
+                hasPlanned: "ring-1 ring-cobalt/40 ring-inset rounded-md text-cobalt-glow",
               }}
               className={cn("p-0 pointer-events-auto")} />
           </div>
