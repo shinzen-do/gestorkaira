@@ -425,7 +425,24 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setCalendarNotes((p) => p.filter((c) => c.id !== id));
   };
 
-  // ---------- Search ----------
+  // ---------- Planned campaigns ----------
+  const createPlannedCampaign: Ctx["createPlannedCampaign"] = async (input) => {
+    need();
+    const { error, data } = await supabase.from("planned_campaigns").insert({ ...input, user_id: uid() }).select().single();
+    if (error) throw error;
+    setPlannedCampaigns((p) => [...p, data as PlannedCampaign]);
+    return data as PlannedCampaign;
+  };
+  const updatePlannedCampaign: Ctx["updatePlannedCampaign"] = async (id, patch) => {
+    const { error } = await supabase.from("planned_campaigns").update(patch).eq("id", id);
+    if (error) throw error;
+    setPlannedCampaigns((p) => p.map((c) => (c.id === id ? { ...c, ...patch } as PlannedCampaign : c)));
+  };
+  const deletePlannedCampaign: Ctx["deletePlannedCampaign"] = async (id) => {
+    const { error } = await supabase.from("planned_campaigns").delete().eq("id", id);
+    if (error) throw error;
+    setPlannedCampaigns((p) => p.filter((c) => c.id !== id));
+  };
   const search: Ctx["search"] = (q) => {
     const term = q.trim().toLowerCase();
     if (!term) return [];
