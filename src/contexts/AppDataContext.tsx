@@ -153,6 +153,7 @@ interface Ctx {
   validatedCreatives: ValidatedCreative[];
   timelineEntries: TimelineEntry[];
   calendarNotes: CalendarNote[];
+  plannedCampaigns: PlannedCampaign[];
 
   // Clients
   createClient: (input: { name: string; industry?: string; monthly_budget?: number; notes?: string }) => Promise<Client | null>;
