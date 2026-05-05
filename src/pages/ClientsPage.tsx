@@ -17,6 +17,7 @@ import { ValidatedCreativeDialog } from "@/components/dialogs/ValidatedCreativeD
 import { ChangeDialog } from "@/components/dialogs/ChangeDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ClientProgrammingSection } from "@/components/ClientProgrammingSection";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
