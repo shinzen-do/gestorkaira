@@ -195,6 +195,11 @@ interface Ctx {
   toggleCalendarNote: (id: string) => Promise<void>;
   deleteCalendarNote: (id: string) => Promise<void>;
 
+  // Planned campaigns
+  createPlannedCampaign: (input: Omit<PlannedCampaign, "id" | "created_at">) => Promise<PlannedCampaign | null>;
+  updatePlannedCampaign: (id: string, patch: Partial<Omit<PlannedCampaign, "id" | "created_at">>) => Promise<void>;
+  deletePlannedCampaign: (id: string) => Promise<void>;
+
   // Helpers
   search: (q: string) => SearchHit[];
   refresh: () => Promise<void>;
