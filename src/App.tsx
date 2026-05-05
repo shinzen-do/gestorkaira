@@ -51,6 +51,7 @@ const App = () => (
                   <Route path="/calendar" element={<Protected><CalendarPage /></Protected>} />
                   <Route path="/timeline" element={<Protected><TimelinePage /></Protected>} />
                   <Route path="/pacing" element={<Protected><PacingPage /></Protected>} />
+                  <Route path="/programacao" element={<Protected><ProgrammingPage /></Protected>} />
                   <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
 
                   <Route path="*" element={<NotFound />} />
