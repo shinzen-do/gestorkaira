@@ -339,6 +339,7 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
             <Tabs defaultValue="campaigns" className="px-4 py-3">
               <TabsList className="bg-secondary/40">
                 <TabsTrigger value="campaigns" className="text-xs gap-1.5"><Megaphone className="w-3.5 h-3.5" /> Campanhas <span className="text-[10px] text-muted-foreground ml-1">{clientCampaigns.length}</span></TabsTrigger>
+                <TabsTrigger value="programming" className="text-xs gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Programação</TabsTrigger>
                 <TabsTrigger value="audiences" className="text-xs gap-1.5"><TargetIcon className="w-3.5 h-3.5" /> Públicos ativos <span className="text-[10px] text-muted-foreground ml-1">{clientAudiences.length}</span></TabsTrigger>
                 <TabsTrigger value="creatives" className="text-xs gap-1.5"><Award className="w-3.5 h-3.5" /> Validados <span className="text-[10px] text-muted-foreground ml-1">{clientValCreatives.length}</span></TabsTrigger>
                 <TabsTrigger value="history" className="text-xs gap-1.5"><History className="w-3.5 h-3.5" /> Histórico</TabsTrigger>
