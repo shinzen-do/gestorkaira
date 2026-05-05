@@ -104,6 +104,23 @@ export interface TimelineEntry {
   occurred_at: string;
 }
 
+export type PlannedStatus = "planned" | "active" | "cancelled";
+
+export interface PlannedCampaign {
+  id: string;
+  client_id: string;
+  name: string;
+  objective: string | null;
+  start_date: string; // YYYY-MM-DD
+  end_date: string;   // YYYY-MM-DD
+  budget_type: BudgetType;
+  daily_amount: number;
+  total_amount: number;
+  status: PlannedStatus;
+  notes: string | null;
+  created_at: string;
+}
+
 export type CalendarPriority = "low" | "medium" | "high";
 export type CalendarLinkType = "none" | "client" | "campaign" | "audience";
 
