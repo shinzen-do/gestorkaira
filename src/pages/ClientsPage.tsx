@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Plus, Users, ChevronRight, Pencil, Trash2, Megaphone, Layers, Film,
-  Target as TargetIcon, History, Award, ExternalLink, Pause, Play, BarChart3, TrendingUp, DollarSign,
+  Target as TargetIcon, History, Award, ExternalLink, Pause, Play, BarChart3, TrendingUp, DollarSign, CalendarClock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
