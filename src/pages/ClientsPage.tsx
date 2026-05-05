@@ -356,7 +356,9 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
                 )}
               </TabsContent>
 
-              <TabsContent value="audiences" className="mt-3 space-y-2">
+              <TabsContent value="programming" className="mt-3">
+                <ClientProgrammingSection clientId={client.id} monthlyBudget={Number(client.monthly_budget) || 0} />
+              </TabsContent>
                 <p className="text-[11px] text-muted-foreground">Públicos que estão vinculados a campanhas deste cliente. Crie ou vincule novos públicos na aba <strong>Públicos</strong>.</p>
                 {clientAudiences.length === 0 ? (
                   <EmptyState icon={TargetIcon} title="Nenhum público vinculado" description="Vá em Públicos e ative um público nas campanhas deste cliente." />
