@@ -170,4 +170,21 @@
   .border-gold-soft {
     border-color: hsl(var(--gold) / 0.25);
   }
+
+  .neon-line-left {
+    position: relative;
+  }
+  .neon-line-left::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, hsl(var(--cobalt-glow)), transparent);
+    box-shadow: 0 0 8px hsl(var(--cobalt-glow) / 0.6);
+    pointer-events: none;
+  }
+
+  .glow-cobalt-soft {
+    box-shadow: 0 0 0 1px hsl(var(--cobalt) / 0.25), 0 0 14px -4px hsl(var(--cobalt-glow) / 0.4);
+  }
 }
