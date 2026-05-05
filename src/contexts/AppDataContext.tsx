@@ -219,17 +219,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [validatedCreatives, setValidatedCreatives] = useState<ValidatedCreative[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [calendarNotes, setCalendarNotes] = useState<CalendarNote[]>([]);
+  const [plannedCampaigns, setPlannedCampaigns] = useState<PlannedCampaign[]>([]);
 
   const refresh = useCallback(async () => {
     if (!user) {
       setClients([]); setCampaigns([]); setAdSets([]); setCreatives([]);
       setAudiences([]); setAudienceCampaigns([]); setValidatedCreatives([]);
-      setTimelineEntries([]); setCalendarNotes([]);
+      setTimelineEntries([]); setCalendarNotes([]); setPlannedCampaigns([]);
       setLoading(false);
       return;
     }
     setLoading(true);
-    const [c, cp, as, cr, au, ac, vc, te, cn] = await Promise.all([
+    const [c, cp, as, cr, au, ac, vc, te, cn, pc] = await Promise.all([
       supabase.from("clients").select("*").order("created_at", { ascending: false }),
       supabase.from("campaigns").select("*").order("created_at", { ascending: false }),
       supabase.from("ad_sets").select("*").order("created_at", { ascending: false }),
@@ -239,6 +240,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }),
       supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }),
       supabase.from("calendar_notes").select("*").order("date", { ascending: true }),
+      supabase.from("planned_campaigns").select("*").order("start_date", { ascending: true }),
     ]);
     setClients((c.data ?? []) as Client[]);
     setCampaigns((cp.data ?? []) as Campaign[]);
@@ -249,6 +251,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setValidatedCreatives((vc.data ?? []) as ValidatedCreative[]);
     setTimelineEntries((te.data ?? []) as TimelineEntry[]);
     setCalendarNotes((cn.data ?? []) as CalendarNote[]);
+    setPlannedCampaigns((pc.data ?? []) as PlannedCampaign[]);
     setLoading(false);
   }, [user]);
 
