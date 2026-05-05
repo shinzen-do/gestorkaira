@@ -469,7 +469,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(
     () => ({
       loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns,
-      validatedCreatives, timelineEntries, calendarNotes,
+      validatedCreatives, timelineEntries, calendarNotes, plannedCampaigns,
       createClient, updateClient, deleteClient,
       createCampaign, updateCampaign, deleteCampaign,
       createAdSet, updateAdSet, deleteAdSet,
@@ -478,10 +478,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       createValidatedCreative, deleteValidatedCreative,
       addTimelineEntry,
       addCalendarNote, updateCalendarNote, toggleCalendarNote, deleteCalendarNote,
+      createPlannedCampaign, updatePlannedCampaign, deletePlannedCampaign,
       search, refresh,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns, validatedCreatives, timelineEntries, calendarNotes],
+    [loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns, validatedCreatives, timelineEntries, calendarNotes, plannedCampaigns],
   );
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
