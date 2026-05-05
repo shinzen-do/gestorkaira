@@ -269,6 +269,36 @@ export default function CalendarPage() {
                 </div>
               </section>
 
+              {plannedForSelected.length > 0 && (
+                <section>
+                  <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 text-cobalt-glow" /> Programação de campanhas
+                  </h2>
+                  <div className="space-y-2">
+                    {plannedForSelected.map(({ kind, p }) => {
+                      const cl = clients.find((c) => c.id === p.client_id);
+                      return (
+                        <div key={`${p.id}-${kind}`} className="rounded-lg border border-cobalt/30 bg-cobalt/5 p-3 flex items-start gap-3">
+                          <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-cobalt-glow shadow-[0_0_6px_hsl(var(--cobalt-glow))]" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-foreground">
+                              <span className="text-cobalt-glow font-medium">{kind === "start" ? "Início" : "Término"}:</span> {p.name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                              {cl?.name ?? "—"}{p.objective && ` · ${p.objective}`} · {p.budget_type === "daily" ? `R$ ${Number(p.daily_amount).toFixed(2)}/dia` : `R$ ${Number(p.total_amount).toFixed(2)} total`}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/clients?focus=${p.client_id}`)}
+                            className="text-[11px] text-cobalt hover:underline shrink-0"
+                          >Abrir</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
               <section>
                 <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                   <History className="w-4 h-4 text-cobalt" /> Mudanças neste dia
