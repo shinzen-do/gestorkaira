@@ -128,18 +128,32 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
 }
 
 export default function CalendarPage() {
-  const { calendarNotes, toggleCalendarNote, deleteCalendarNote, clients, audiences, campaigns, timelineEntries } = useAppData();
+  const { calendarNotes, toggleCalendarNote, deleteCalendarNote, clients, audiences, campaigns, timelineEntries, plannedCampaigns } = useAppData();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
   const today = startOfDay(new Date());
 
   const noteDates = useMemo(() => calendarNotes.filter((n) => !n.done).map((n) => parseISO(n.date)), [calendarNotes]);
   const changeDates = useMemo(() => timelineEntries.map((t) => parseISO(t.occurred_at)), [timelineEntries]);
+  const plannedDates = useMemo(() =>
+    plannedCampaigns.filter((p) => p.status !== "cancelled").flatMap((p) => [parseISO(p.start_date), parseISO(p.end_date)]),
+  [plannedCampaigns]);
 
   const notesForSelected = useMemo(() => {
     if (!selectedDate) return [];
     return calendarNotes.filter((n) => isSameDay(parseISO(n.date), selectedDate));
   }, [calendarNotes, selectedDate]);
+
+  const plannedForSelected = useMemo(() => {
+    if (!selectedDate) return [] as { kind: "start" | "end"; p: typeof plannedCampaigns[number] }[];
+    const out: { kind: "start" | "end"; p: typeof plannedCampaigns[number] }[] = [];
+    plannedCampaigns.forEach((p) => {
+      if (p.status === "cancelled") return;
+      if (isSameDay(parseISO(p.start_date), selectedDate)) out.push({ kind: "start", p });
+      if (isSameDay(parseISO(p.end_date), selectedDate)) out.push({ kind: "end", p });
+    });
+    return out;
+  }, [plannedCampaigns, selectedDate]);
 
   const changesForSelected = useMemo(() => {
     if (!selectedDate) return [];
@@ -223,10 +237,11 @@ export default function CalendarPage() {
         <div className="lg:col-span-1 space-y-4">
           <div className="glass-card p-4">
             <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} locale={ptBR}
-              modifiers={{ hasNote: noteDates, hasChange: changeDates }}
+              modifiers={{ hasNote: noteDates, hasChange: changeDates, hasPlanned: plannedDates }}
               modifiersClassNames={{
                 hasNote: "relative font-semibold text-gold",
                 hasChange: "after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:rounded-full after:bg-cobalt",
+                hasPlanned: "ring-1 ring-cobalt/40 ring-inset rounded-md text-cobalt-glow",
               }}
               className={cn("p-0 pointer-events-auto")} />
           </div>
@@ -253,6 +268,36 @@ export default function CalendarPage() {
                     : notesForSelected.map((n) => <NoteCard key={n.id} n={n} />)}
                 </div>
               </section>
+
+              {plannedForSelected.length > 0 && (
+                <section>
+                  <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 text-cobalt-glow" /> Programação de campanhas
+                  </h2>
+                  <div className="space-y-2">
+                    {plannedForSelected.map(({ kind, p }) => {
+                      const cl = clients.find((c) => c.id === p.client_id);
+                      return (
+                        <div key={`${p.id}-${kind}`} className="rounded-lg border border-cobalt/30 bg-cobalt/5 p-3 flex items-start gap-3">
+                          <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-cobalt-glow shadow-[0_0_6px_hsl(var(--cobalt-glow))]" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-foreground">
+                              <span className="text-cobalt-glow font-medium">{kind === "start" ? "Início" : "Término"}:</span> {p.name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                              {cl?.name ?? "—"}{p.objective && ` · ${p.objective}`} · {p.budget_type === "daily" ? `R$ ${Number(p.daily_amount).toFixed(2)}/dia` : `R$ ${Number(p.total_amount).toFixed(2)} total`}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/clients?focus=${p.client_id}`)}
+                            className="text-[11px] text-cobalt hover:underline shrink-0"
+                          >Abrir</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
 
               <section>
                 <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">

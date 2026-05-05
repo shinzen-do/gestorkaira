@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Plus, Users, ChevronRight, Pencil, Trash2, Megaphone, Layers, Film,
-  Target as TargetIcon, History, Award, ExternalLink, Pause, Play, BarChart3, TrendingUp, DollarSign,
+  Target as TargetIcon, History, Award, ExternalLink, Pause, Play, BarChart3, TrendingUp, DollarSign, CalendarClock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { ValidatedCreativeDialog } from "@/components/dialogs/ValidatedCreativeD
 import { ChangeDialog } from "@/components/dialogs/ChangeDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ClientProgrammingSection } from "@/components/ClientProgrammingSection";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
@@ -339,6 +340,7 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
             <Tabs defaultValue="campaigns" className="px-4 py-3">
               <TabsList className="bg-secondary/40">
                 <TabsTrigger value="campaigns" className="text-xs gap-1.5"><Megaphone className="w-3.5 h-3.5" /> Campanhas <span className="text-[10px] text-muted-foreground ml-1">{clientCampaigns.length}</span></TabsTrigger>
+                <TabsTrigger value="programming" className="text-xs gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Programação</TabsTrigger>
                 <TabsTrigger value="audiences" className="text-xs gap-1.5"><TargetIcon className="w-3.5 h-3.5" /> Públicos ativos <span className="text-[10px] text-muted-foreground ml-1">{clientAudiences.length}</span></TabsTrigger>
                 <TabsTrigger value="creatives" className="text-xs gap-1.5"><Award className="w-3.5 h-3.5" /> Validados <span className="text-[10px] text-muted-foreground ml-1">{clientValCreatives.length}</span></TabsTrigger>
                 <TabsTrigger value="history" className="text-xs gap-1.5"><History className="w-3.5 h-3.5" /> Histórico</TabsTrigger>
@@ -353,6 +355,10 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
                 ) : (
                   clientCampaigns.map((c) => <CampaignBlock key={c.id} campaign={c} client={client} />)
                 )}
+              </TabsContent>
+
+              <TabsContent value="programming" className="mt-3">
+                <ClientProgrammingSection clientId={client.id} monthlyBudget={Number(client.monthly_budget) || 0} />
               </TabsContent>
 
               <TabsContent value="audiences" className="mt-3 space-y-2">

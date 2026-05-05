@@ -104,6 +104,23 @@ export interface TimelineEntry {
   occurred_at: string;
 }
 
+export type PlannedStatus = "planned" | "active" | "cancelled";
+
+export interface PlannedCampaign {
+  id: string;
+  client_id: string;
+  name: string;
+  objective: string | null;
+  start_date: string; // YYYY-MM-DD
+  end_date: string;   // YYYY-MM-DD
+  budget_type: BudgetType;
+  daily_amount: number;
+  total_amount: number;
+  status: PlannedStatus;
+  notes: string | null;
+  created_at: string;
+}
+
 export type CalendarPriority = "low" | "medium" | "high";
 export type CalendarLinkType = "none" | "client" | "campaign" | "audience";
 
@@ -136,6 +153,7 @@ interface Ctx {
   validatedCreatives: ValidatedCreative[];
   timelineEntries: TimelineEntry[];
   calendarNotes: CalendarNote[];
+  plannedCampaigns: PlannedCampaign[];
 
   // Clients
   createClient: (input: { name: string; industry?: string; monthly_budget?: number; notes?: string }) => Promise<Client | null>;
@@ -177,6 +195,11 @@ interface Ctx {
   toggleCalendarNote: (id: string) => Promise<void>;
   deleteCalendarNote: (id: string) => Promise<void>;
 
+  // Planned campaigns
+  createPlannedCampaign: (input: Omit<PlannedCampaign, "id" | "created_at">) => Promise<PlannedCampaign | null>;
+  updatePlannedCampaign: (id: string, patch: Partial<Omit<PlannedCampaign, "id" | "created_at">>) => Promise<void>;
+  deletePlannedCampaign: (id: string) => Promise<void>;
+
   // Helpers
   search: (q: string) => SearchHit[];
   refresh: () => Promise<void>;
@@ -196,17 +219,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [validatedCreatives, setValidatedCreatives] = useState<ValidatedCreative[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [calendarNotes, setCalendarNotes] = useState<CalendarNote[]>([]);
+  const [plannedCampaigns, setPlannedCampaigns] = useState<PlannedCampaign[]>([]);
 
   const refresh = useCallback(async () => {
     if (!user) {
       setClients([]); setCampaigns([]); setAdSets([]); setCreatives([]);
       setAudiences([]); setAudienceCampaigns([]); setValidatedCreatives([]);
-      setTimelineEntries([]); setCalendarNotes([]);
+      setTimelineEntries([]); setCalendarNotes([]); setPlannedCampaigns([]);
       setLoading(false);
       return;
     }
     setLoading(true);
-    const [c, cp, as, cr, au, ac, vc, te, cn] = await Promise.all([
+    const [c, cp, as, cr, au, ac, vc, te, cn, pc] = await Promise.all([
       supabase.from("clients").select("*").order("created_at", { ascending: false }),
       supabase.from("campaigns").select("*").order("created_at", { ascending: false }),
       supabase.from("ad_sets").select("*").order("created_at", { ascending: false }),
@@ -216,6 +240,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }),
       supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }),
       supabase.from("calendar_notes").select("*").order("date", { ascending: true }),
+      supabase.from("planned_campaigns").select("*").order("start_date", { ascending: true }),
     ]);
     setClients((c.data ?? []) as Client[]);
     setCampaigns((cp.data ?? []) as Campaign[]);
@@ -226,6 +251,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setValidatedCreatives((vc.data ?? []) as ValidatedCreative[]);
     setTimelineEntries((te.data ?? []) as TimelineEntry[]);
     setCalendarNotes((cn.data ?? []) as CalendarNote[]);
+    setPlannedCampaigns((pc.data ?? []) as PlannedCampaign[]);
     setLoading(false);
   }, [user]);
 
@@ -399,7 +425,24 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setCalendarNotes((p) => p.filter((c) => c.id !== id));
   };
 
-  // ---------- Search ----------
+  // ---------- Planned campaigns ----------
+  const createPlannedCampaign: Ctx["createPlannedCampaign"] = async (input) => {
+    need();
+    const { error, data } = await supabase.from("planned_campaigns").insert({ ...input, user_id: uid() }).select().single();
+    if (error) throw error;
+    setPlannedCampaigns((p) => [...p, data as PlannedCampaign]);
+    return data as PlannedCampaign;
+  };
+  const updatePlannedCampaign: Ctx["updatePlannedCampaign"] = async (id, patch) => {
+    const { error } = await supabase.from("planned_campaigns").update(patch).eq("id", id);
+    if (error) throw error;
+    setPlannedCampaigns((p) => p.map((c) => (c.id === id ? { ...c, ...patch } as PlannedCampaign : c)));
+  };
+  const deletePlannedCampaign: Ctx["deletePlannedCampaign"] = async (id) => {
+    const { error } = await supabase.from("planned_campaigns").delete().eq("id", id);
+    if (error) throw error;
+    setPlannedCampaigns((p) => p.filter((c) => c.id !== id));
+  };
   const search: Ctx["search"] = (q) => {
     const term = q.trim().toLowerCase();
     if (!term) return [];
@@ -426,7 +469,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(
     () => ({
       loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns,
-      validatedCreatives, timelineEntries, calendarNotes,
+      validatedCreatives, timelineEntries, calendarNotes, plannedCampaigns,
       createClient, updateClient, deleteClient,
       createCampaign, updateCampaign, deleteCampaign,
       createAdSet, updateAdSet, deleteAdSet,
@@ -435,10 +478,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       createValidatedCreative, deleteValidatedCreative,
       addTimelineEntry,
       addCalendarNote, updateCalendarNote, toggleCalendarNote, deleteCalendarNote,
+      createPlannedCampaign, updatePlannedCampaign, deletePlannedCampaign,
       search, refresh,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns, validatedCreatives, timelineEntries, calendarNotes],
+    [loading, clients, campaigns, adSets, creatives, audiences, audienceCampaigns, validatedCreatives, timelineEntries, calendarNotes, plannedCampaigns],
   );
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;

@@ -19,6 +19,7 @@ import AudiencesPage from "./pages/AudiencesPage";
 import CalendarPage from "./pages/CalendarPage";
 import TimelinePage from "./pages/TimelinePage";
 import PacingPage from "./pages/PacingPage";
+import ProgrammingPage from "./pages/ProgrammingPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -50,6 +51,7 @@ const App = () => (
                   <Route path="/calendar" element={<Protected><CalendarPage /></Protected>} />
                   <Route path="/timeline" element={<Protected><TimelinePage /></Protected>} />
                   <Route path="/pacing" element={<Protected><PacingPage /></Protected>} />
+                  <Route path="/programacao" element={<Protected><ProgrammingPage /></Protected>} />
                   <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
 
                   <Route path="*" element={<NotFound />} />

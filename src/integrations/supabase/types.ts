@@ -406,6 +406,57 @@ export type Database = {
         }
         Relationships: []
       }
+      planned_campaigns: {
+        Row: {
+          budget_type: string
+          client_id: string
+          created_at: string
+          daily_amount: number | null
+          end_date: string
+          id: string
+          name: string
+          notes: string | null
+          objective: string | null
+          start_date: string
+          status: string
+          total_amount: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_type?: string
+          client_id: string
+          created_at?: string
+          daily_amount?: number | null
+          end_date: string
+          id?: string
+          name: string
+          notes?: string | null
+          objective?: string | null
+          start_date: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_type?: string
+          client_id?: string
+          created_at?: string
+          daily_amount?: number | null
+          end_date?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          objective?: string | null
+          start_date?: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
