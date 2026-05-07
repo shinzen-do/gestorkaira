@@ -23,7 +23,7 @@ export function KairaSidebar() {
   ];
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border relative">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       {/* Detalhe neon azul: linha fina vertical no lado esquerdo */}
       <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-cobalt-glow to-transparent opacity-70 shadow-[0_0_8px_hsl(var(--cobalt-glow)/0.6)]" />
 
