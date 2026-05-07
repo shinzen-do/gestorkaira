@@ -111,13 +111,13 @@
     --health-yellow: 42 85% 58%;
     --health-red: 0 70% 58%;
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 40 8% 78%;
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 40 8% 80%;
     --sidebar-primary: 42 65% 58%;
     --sidebar-primary-foreground: 0 0% 6%;
-    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 40 15% 92%;
-    --sidebar-border: 0 0% 18%;
+    --sidebar-border: 220 30% 22%;
     --sidebar-ring: 42 65% 58%;
   }
 }
