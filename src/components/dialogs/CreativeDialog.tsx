@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppData, type Creative, type CreativeFormat } from "@/contexts/AppDataContext";
 import { toast } from "sonner";
+import { useDialogPersist } from "@/hooks/useDraft";
 
 interface Props {
   trigger: React.ReactNode;
@@ -17,7 +18,7 @@ const RESULT_LABELS = ["conversas", "leads", "compras", "cadastros", "cliques no
 
 export function CreativeDialog({ trigger, adSetId, creative }: Props) {
   const { createCreative, updateCreative } = useAppData();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useDialogPersist(`creative:${creative?.id ?? `new-${adSetId}`}`);
   const [name, setName] = useState("");
   const [format, setFormat] = useState<CreativeFormat>("image");
   const [url, setUrl] = useState("");

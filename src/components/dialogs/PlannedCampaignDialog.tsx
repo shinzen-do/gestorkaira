@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useAppData, type PlannedCampaign, type BudgetType, type PlannedStatus } from "@/contexts/AppDataContext";
 import { toast } from "sonner";
+import { useDialogPersist } from "@/hooks/useDraft";
 
 interface Props {
   trigger: ReactNode;
@@ -22,7 +23,7 @@ interface Props {
 
 export function PlannedCampaignDialog({ trigger, clientId, planned }: Props) {
   const { clients, createPlannedCampaign, updatePlannedCampaign } = useAppData();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useDialogPersist(`planned:${planned?.id ?? `new-${clientId ?? "any"}`}`);
 
   const [selectedClient, setSelectedClient] = useState<string>(clientId ?? planned?.client_id ?? "");
   const [name, setName] = useState(planned?.name ?? "");
