@@ -58,6 +58,45 @@ export type Database = {
           },
         ]
       }
+      ai_tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          done: boolean
+          due_date: string | null
+          id: string
+          priority: string
+          source: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          priority?: string
+          source?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          priority?: string
+          source?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audience_campaigns: {
         Row: {
           audience_id: string
@@ -187,6 +226,7 @@ export type Database = {
       campaigns: {
         Row: {
           budget: number | null
+          budget_strategy: string
           budget_type: string
           client_id: string
           created_at: string
@@ -201,6 +241,7 @@ export type Database = {
         }
         Insert: {
           budget?: number | null
+          budget_strategy?: string
           budget_type?: string
           client_id: string
           created_at?: string
@@ -215,6 +256,7 @@ export type Database = {
         }
         Update: {
           budget?: number | null
+          budget_strategy?: string
           budget_type?: string
           client_id?: string
           created_at?: string
@@ -373,6 +415,42 @@ export type Database = {
           },
         ]
       }
+      follower_snapshots: {
+        Row: {
+          client_id: string
+          created_at: string
+          date: string
+          facebook: number | null
+          id: string
+          instagram: number | null
+          tiktok: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          date: string
+          facebook?: number | null
+          id?: string
+          instagram?: number | null
+          tiktok?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          date?: string
+          facebook?: number | null
+          id?: string
+          instagram?: number | null
+          tiktok?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       monthly_budgets: {
         Row: {
           client_id: string
@@ -524,24 +602,30 @@ export type Database = {
         Row: {
           created_at: string
           display_name: string | null
+          history_tracking_enabled: boolean
           language: string
           theme: string
+          tutorial_completed: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           display_name?: string | null
+          history_tracking_enabled?: boolean
           language?: string
           theme?: string
+          tutorial_completed?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           display_name?: string | null
+          history_tracking_enabled?: boolean
           language?: string
           theme?: string
+          tutorial_completed?: boolean
           updated_at?: string
           user_id?: string
         }
