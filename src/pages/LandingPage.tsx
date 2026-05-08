@@ -632,7 +632,7 @@ export default function LandingPage() {
       <footer className="border-t border-border py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <KairaK className="w-3.5 h-3.5 text-cobalt" />
+            <KairaLogo size={20} />
             <span className="font-semibold text-foreground">Kaira</span>
             <span>· Central de comando para gestores de elite</span>
           </div>
