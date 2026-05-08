@@ -23,6 +23,8 @@ export interface Client {
   created_at: string;
 }
 
+export type BudgetStrategy = "cbo" | "abo";
+
 export interface Campaign {
   id: string;
   client_id: string;
@@ -31,6 +33,7 @@ export interface Campaign {
   status: Status;
   budget: number;
   budget_type: BudgetType;
+  budget_strategy: BudgetStrategy;
   spend: number;
   roas: number;
   created_at: string;
