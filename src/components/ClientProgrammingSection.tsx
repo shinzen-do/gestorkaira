@@ -1,6 +1,6 @@
 import { differenceInCalendarDays, parseISO, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar as CalIcon, Pencil, Trash2, Plus, Sparkles } from "lucide-react";
+import { Calendar as CalIcon, Pencil, Trash2, Plus, Sparkles, Play, Pause } from "lucide-react";
 import { useAppData, type PlannedCampaign } from "@/contexts/AppDataContext";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -17,7 +17,7 @@ export function plannedTotal(p: PlannedCampaign): number {
 }
 
 export function ClientProgrammingSection({ clientId, monthlyBudget }: { clientId: string; monthlyBudget: number }) {
-  const { plannedCampaigns, deletePlannedCampaign } = useAppData();
+  const { plannedCampaigns, deletePlannedCampaign, updatePlannedCampaign } = useAppData();
   const items = plannedCampaigns
     .filter((p) => p.client_id === clientId && p.status !== "cancelled")
     .sort((a, b) => a.start_date.localeCompare(b.start_date));
@@ -114,6 +114,19 @@ export function ClientProgrammingSection({ clientId, monthlyBudget }: { clientId
                   {p.notes && <p className="text-[11px] text-muted-foreground mt-1 italic">{p.notes}</p>}
                 </div>
                 <div className="flex items-center gap-0.5 shrink-0">
+                  {p.status === "planned" ? (
+                    <button
+                      title="Ativar agora"
+                      onClick={() => updatePlannedCampaign(p.id, { status: "active" }).then(() => toast.success("Campanha ativada"))}
+                      className="p-1.5 rounded hover:bg-cobalt/10 text-cobalt"
+                    ><Play className="w-3.5 h-3.5" /></button>
+                  ) : p.status === "active" ? (
+                    <button
+                      title="Marcar como planejada"
+                      onClick={() => updatePlannedCampaign(p.id, { status: "planned" }).then(() => toast.success("Voltou para planejada"))}
+                      className="p-1.5 rounded hover:bg-secondary text-muted-foreground"
+                    ><Pause className="w-3.5 h-3.5" /></button>
+                  ) : null}
                   <PlannedCampaignDialog
                     clientId={clientId}
                     planned={p}

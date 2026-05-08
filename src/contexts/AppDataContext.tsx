@@ -23,6 +23,8 @@ export interface Client {
   created_at: string;
 }
 
+export type BudgetStrategy = "cbo" | "abo";
+
 export interface Campaign {
   id: string;
   client_id: string;
@@ -31,6 +33,7 @@ export interface Campaign {
   status: Status;
   budget: number;
   budget_type: BudgetType;
+  budget_strategy: BudgetStrategy;
   spend: number;
   roas: number;
   created_at: string;
@@ -161,8 +164,8 @@ interface Ctx {
   deleteClient: (id: string) => Promise<void>;
 
   // Campaigns
-  createCampaign: (input: { client_id: string; name: string; objective?: string; budget?: number; budget_type?: BudgetType }) => Promise<Campaign | null>;
-  updateCampaign: (id: string, patch: Partial<Pick<Campaign, "name" | "objective" | "status" | "budget" | "budget_type" | "spend" | "roas">>) => Promise<void>;
+  createCampaign: (input: { client_id: string; name: string; objective?: string; budget?: number; budget_type?: BudgetType; budget_strategy?: BudgetStrategy }) => Promise<Campaign | null>;
+  updateCampaign: (id: string, patch: Partial<Pick<Campaign, "name" | "objective" | "status" | "budget" | "budget_type" | "budget_strategy" | "spend" | "roas">>) => Promise<void>;
   deleteCampaign: (id: string) => Promise<void>;
 
   // AdSets

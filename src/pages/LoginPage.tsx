@@ -13,7 +13,7 @@ import {
   Activity,
   ArrowRight,
 } from "lucide-react";
-import { KairaK } from "@/components/shared/KairaK";
+import { KairaLogo } from "@/components/shared/KairaLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -123,9 +123,7 @@ export default function LoginPage() {
         />
 
         <Link to="/" className="inline-flex items-center gap-3 relative z-10 group">
-          <div className="w-10 h-10 rounded-xl bg-cobalt/15 border border-cobalt/30 flex items-center justify-center group-hover:bg-cobalt/25 transition-colors">
-            <KairaK className="w-5 h-5 text-cobalt" />
-          </div>
+          <KairaLogo size={40} />
           <span className="text-xl font-semibold tracking-tight">Kaira</span>
         </Link>
 
@@ -186,9 +184,7 @@ export default function LoginPage() {
           {/* Mobile brand */}
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-cobalt/20 flex items-center justify-center">
-                <KairaK className="w-5 h-5 text-cobalt" />
-              </div>
+              <KairaLogo size={40} />
               <span className="text-xl font-semibold">Kaira</span>
             </Link>
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogFooter, DialogTrigger,
@@ -10,51 +10,54 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppData, type Client } from "@/contexts/AppDataContext";
 import { toast } from "sonner";
+import { useDraft, useDialogPersist } from "@/hooks/useDraft";
+import { useState } from "react";
 
 interface Props {
   trigger: React.ReactNode;
-  client?: Client; // se passar, é edição
+  client?: Client;
 }
 
 export function ClientDialog({ trigger, client }: Props) {
   const { createClient, updateClient } = useAppData();
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [budget, setBudget] = useState("0");
-  const [status, setStatus] = useState<"active" | "paused" | "archived">("active");
-  const [notes, setNotes] = useState("");
+  const draftKey = `client:${client?.id ?? "new"}`;
+  const [open, setOpen] = useDialogPersist(draftKey);
+  const [form, setForm, clearDraft] = useDraft(draftKey, {
+    name: "", industry: "", budget: "0", notes: "",
+    status: "active" as "active" | "paused" | "archived",
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open && client) {
-      setName(client.name);
-      setIndustry(client.industry ?? "");
-      setBudget(String(client.monthly_budget ?? 0));
-      setStatus(client.status);
-      setNotes(client.notes ?? "");
-    } else if (open) {
-      setName(""); setIndustry(""); setBudget("0"); setStatus("active"); setNotes("");
+      setForm({
+        name: client.name, industry: client.industry ?? "",
+        budget: String(client.monthly_budget ?? 0),
+        status: client.status, notes: client.notes ?? "",
+      });
     }
   }, [open, client]);
 
+  const set = (p: Partial<typeof form>) => setForm({ ...form, ...p });
+
   const submit = async () => {
-    if (!name.trim()) return toast.error("Nome obrigatório");
+    if (!form.name.trim()) return toast.error("Nome obrigatório");
     setSaving(true);
     try {
       const payload = {
-        name: name.trim(),
-        industry: industry.trim() || undefined,
-        monthly_budget: Number(budget) || 0,
-        notes: notes.trim() || undefined,
+        name: form.name.trim(),
+        industry: form.industry.trim() || undefined,
+        monthly_budget: Number(form.budget) || 0,
+        notes: form.notes.trim() || undefined,
       };
       if (client) {
-        await updateClient(client.id, { ...payload, status });
+        await updateClient(client.id, { ...payload, status: form.status });
         toast.success("Cliente atualizado");
       } else {
         await createClient(payload);
         toast.success("Cliente criado");
       }
+      clearDraft();
       setOpen(false);
     } catch (e: any) {
       toast.error("Erro ao salvar", { description: e.message });
@@ -70,14 +73,14 @@ export function ClientDialog({ trigger, client }: Props) {
           <DialogDescription>{client ? "Atualize os dados do cliente." : "Cadastre um novo cliente."}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
-          <div className="space-y-1.5"><Label>Nome *</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex.: Acme Cosméticos" /></div>
+          <div className="space-y-1.5"><Label>Nome *</Label><Input value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="Ex.: Acme Cosméticos" /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label>Indústria / Nicho</Label><Input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Ex.: E-commerce" /></div>
-            <div className="space-y-1.5"><Label>Orçamento mensal (R$)</Label><Input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label>Indústria / Nicho</Label><Input value={form.industry} onChange={(e) => set({ industry: e.target.value })} placeholder="Ex.: E-commerce" /></div>
+            <div className="space-y-1.5"><Label>Orçamento mensal (R$)</Label><Input type="number" value={form.budget} onChange={(e) => set({ budget: e.target.value })} /></div>
           </div>
           {client && (
             <div className="space-y-1.5"><Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
+              <Select value={form.status} onValueChange={(v) => set({ status: v as typeof form.status })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Ativo</SelectItem>
@@ -87,10 +90,10 @@ export function ClientDialog({ trigger, client }: Props) {
               </Select>
             </div>
           )}
-          <div className="space-y-1.5"><Label>Observações</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Contexto, contato, objetivos..." /></div>
+          <div className="space-y-1.5"><Label>Observações</Label><Textarea value={form.notes} onChange={(e) => set({ notes: e.target.value })} rows={3} placeholder="Contexto, contato, objetivos..." /></div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => { clearDraft(); setOpen(false); }}>Cancelar</Button>
           <Button onClick={submit} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
         </DialogFooter>
       </DialogContent>

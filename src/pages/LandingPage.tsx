@@ -19,7 +19,7 @@ import {
   LineChart,
   Lock,
 } from "lucide-react";
-import { KairaK } from "@/components/shared/KairaK";
+import { KairaLogo } from "@/components/shared/KairaLogo";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -169,9 +169,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-glass-border">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-cobalt/20 flex items-center justify-center">
-              <KairaK className="w-4 h-4 text-cobalt" />
-            </div>
+            <KairaLogo size={32} />
             <span className="text-lg font-semibold tracking-tight">Kaira</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
@@ -634,7 +632,7 @@ export default function LandingPage() {
       <footer className="border-t border-border py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <KairaK className="w-3.5 h-3.5 text-cobalt" />
+            <KairaLogo size={20} />
             <span className="font-semibold text-foreground">Kaira</span>
             <span>· Central de comando para gestores de elite</span>
           </div>
