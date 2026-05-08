@@ -466,7 +466,7 @@ export default function PacingPage() {
 
                   {clientSpends.length > 0 && (
                     <div className="text-xs text-muted-foreground">
-                      Histórico: {clientSpends.slice(0, 6).map((s) => `Dia ${s.day}: ${fmtBRL(s.spent_so_far)}`).join(" · ")}
+                      Histórico: {[...clientSpends].sort((a, b) => a.day - b.day).map((s) => `Dia ${s.day}: ${fmtBRL(s.spent_so_far)}`).join(" · ")}
                     </div>
                   )}
                 </CardContent>
