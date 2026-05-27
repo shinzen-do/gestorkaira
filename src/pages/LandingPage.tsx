@@ -12,12 +12,9 @@ import {
   Clock,
   TrendingUp,
   Target,
-  Users,
-  Star,
-  ChevronDown,
   Workflow,
-  LineChart,
   Lock,
+  Crown,
 } from "lucide-react";
 import { KairaLogo } from "@/components/shared/KairaLogo";
 import { Button } from "@/components/ui/button";
@@ -78,13 +75,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: "3.4x", label: "ROAS médio dos usuários" },
-  { value: "67%", label: "Menos tempo em planilhas" },
-  { value: "12h", label: "Economizadas por semana" },
-  { value: "99.9%", label: "Uptime garantido" },
-];
-
 const steps = [
   {
     number: "01",
@@ -106,27 +96,70 @@ const steps = [
   },
 ];
 
-const testimonials = [
+const pricingPlans = [
   {
-    name: "Rafael Mendes",
-    role: "Head de Tráfego, Agência Vortex",
-    content:
-      "Substituí 4 ferramentas por uma só. Meu time recuperou 2 dias por semana e nossos clientes notaram a diferença na primeira reunião.",
-    rating: 5,
+    name: "Free",
+    price: "R$ 0",
+    period: "para sempre",
+    description: "Conheça o Kaira sem custo.",
+    features: [
+      "1 cliente ativo",
+      "Campanhas e conjuntos ilimitados",
+      "Pacing e calendário básicos",
+      "Acesso ao painel hierárquico",
+    ],
+    cta: "Começar grátis",
+    href: "/login",
+    highlight: false,
+    badge: null as string | null,
   },
   {
-    name: "Camila Duarte",
-    role: "Gestora de Performance Freelancer",
-    content:
-      "A timeline de mudanças mudou minha vida. Quando uma campanha despenca, eu sei exatamente o que mexi — e quando.",
-    rating: 5,
+    name: "Pro Mensal",
+    price: "R$ 47",
+    period: "por mês",
+    description: "Tudo que um gestor solo precisa.",
+    features: [
+      "Clientes ilimitados",
+      "Pacing, programação e timeline completos",
+      "Tarefas com IA e seguidores",
+      "Histórico auditável e exportação PDF",
+      "Suporte prioritário",
+    ],
+    cta: "Assinar Pro",
+    href: "/signup?plan=pro_monthly",
+    highlight: true,
+    badge: "Mais escolhido",
   },
   {
-    name: "Lucas Ferreira",
-    role: "CEO, Growth Lab",
-    content:
-      "Finalmente uma ferramenta com a sofisticação que o nível do nosso trabalho exige. Vale cada centavo.",
-    rating: 5,
+    name: "Pro Anual",
+    price: "R$ 470",
+    period: "por ano",
+    description: "Economiza R$ 94 vs mensal (17% off).",
+    features: [
+      "Todos os recursos do Pro Mensal",
+      "2 meses grátis",
+      "Atualizações antecipadas",
+    ],
+    cta: "Assinar Anual",
+    href: "/signup?plan=pro_yearly",
+    highlight: false,
+    badge: "Melhor custo",
+  },
+  {
+    name: "Vitalício Launch",
+    price: "R$ 497",
+    period: "pagamento único",
+    description: "Acesso para sempre. Limitado a 50 vagas no lançamento.",
+    features: [
+      "Tudo do Pro, para sempre",
+      "Prioridade total nas novas features",
+      "Lock-in do preço — nunca sobe",
+      "Selo de fundador na plataforma",
+    ],
+    cta: "Garantir vaga",
+    href: "/signup?plan=lifetime",
+    highlight: false,
+    badge: "Edição fundador",
   },
 ];
 
@@ -157,8 +190,12 @@ const faqs = [
     a: "Sim. Sem fidelidade, sem letras miúdas. Você fica porque entrega valor — não porque está preso.",
   },
   {
-    q: "Tem teste grátis?",
-    a: "Sim. Crie sua conta agora e explore todas as funcionalidades sem cartão de crédito.",
+    q: "Tem plano grátis?",
+    a: "Sim. O plano Free dá acesso a 1 cliente ativo, campanhas e conjuntos ilimitados, pacing e calendário básicos. Suba para o Pro quando precisar de mais clientes ou recursos.",
+  },
+  {
+    q: "O que muda no plano Vitalício?",
+    a: "Pagamento único, acesso ao Pro para sempre, lock-in do preço, prioridade em novas features e selo de fundador. Limitado a 50 vagas no lançamento.",
   },
 ];
 
@@ -175,7 +212,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Recursos</a>
             <a href="#how" className="hover:text-foreground transition-colors">Como funciona</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Clientes</a>
+            <a href="#pricing" className="hover:text-foreground transition-colors">Preço</a>
             <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
@@ -183,7 +220,7 @@ export default function LandingPage() {
               <Link to="/login">Entrar</Link>
             </Button>
             <Button asChild className="glow-cobalt">
-              <Link to="/signup">Começar Grátis</Link>
+              <Link to="/login">Começar Grátis</Link>
             </Button>
           </div>
         </div>
@@ -247,7 +284,7 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
           >
             <Button size="lg" asChild className="glow-cobalt text-base px-8 h-12">
-              <Link to="/signup">
+              <Link to="/login">
                 Começar Grátis Agora
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
@@ -286,15 +323,12 @@ export default function LandingPage() {
             <div className="absolute -inset-4 bg-cobalt/10 blur-3xl rounded-full" />
             <div className="glass-card p-2 relative">
               <div className="bg-surface-1 rounded-lg p-6 border border-glass-border">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  {stats.map((s) => (
-                    <div key={s.label} className="text-left">
-                      <div className="text-2xl md:text-3xl font-bold text-gradient-cobalt">
-                        {s.value}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Painel</p>
+                    <p className="text-sm font-medium">Saúde dos clientes</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">atualizado agora</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-left">
                   {[
@@ -450,56 +484,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 px-6 border-t border-border/50">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Gestores de elite{" "}
-              <span className="text-muted-foreground">já escolheram.</span>
-            </h2>
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground">4.9/5 · 200+ profissionais</span>
-            </div>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.name}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="glass-card p-8 flex flex-col"
-              >
-                <div className="flex mb-4">
-                  {[...Array(t.rating)].map((_, idx) => (
-                    <Star key={idx} className="w-3.5 h-3.5 fill-accent text-accent" />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed mb-6 flex-1">"{t.content}"</p>
-                <div className="border-t border-glass-border pt-4">
-                  <div className="font-semibold text-sm">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Comparison */}
       <section className="py-24 px-6 border-t border-border/50">
         <div className="max-w-4xl mx-auto">
@@ -547,6 +531,100 @@ export default function LandingPage() {
               </div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="py-24 px-6 border-t border-border/50 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cobalt/5 blur-[120px]" />
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+              Escolha o seu <span className="text-gradient-cobalt">plano.</span>
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Comece grátis. Suba para o Pro quando o Kaira já estiver te economizando horas.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {pricingPlans.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                custom={i}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className={`glass-card p-6 flex flex-col relative ${
+                  plan.highlight
+                    ? "border-cobalt/40 shadow-[0_0_40px_-10px_hsl(var(--cobalt)/0.4)]"
+                    : ""
+                }`}
+              >
+                {plan.badge && (
+                  <span
+                    className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap ${
+                      plan.highlight
+                        ? "bg-cobalt text-white shadow-[0_0_18px_-2px_hsl(var(--cobalt)/0.6)]"
+                        : "bg-accent/15 text-accent border border-accent/30"
+                    }`}
+                  >
+                    {plan.badge}
+                  </span>
+                )}
+
+                <div className="mb-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    {plan.name === "Vitalício Launch" && <Crown className="w-4 h-4 text-accent" />}
+                    <h3 className="text-lg font-semibold">{plan.name}</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed min-h-[32px]">
+                    {plan.description}
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-bold tracking-tight">{plan.price}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{plan.period}</p>
+                </div>
+
+                <ul className="space-y-2.5 mb-6 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 text-cobalt mt-0.5 flex-shrink-0" />
+                      <span className="text-xs leading-relaxed">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  asChild
+                  variant={plan.highlight ? "default" : "outline"}
+                  className={`w-full ${plan.highlight ? "glow-cobalt" : ""}`}
+                >
+                  <Link to={plan.href}>
+                    {plan.cta}
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Link>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-8">
+            Pagamento processado com segurança. Sem fidelidade nos planos mensais e anuais. Cancele quando quiser.
+          </p>
         </div>
       </section>
 
@@ -605,7 +683,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Button size="lg" asChild className="glow-cobalt text-base px-10 h-12">
-              <Link to="/signup">
+              <Link to="/login">
                 Começar Grátis Agora
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
@@ -630,13 +708,24 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-border py-10 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <KairaLogo size={20} />
-            <span className="font-semibold text-foreground">Kaira</span>
-            <span>· Central de comando para gestores de elite</span>
+        <div className="max-w-6xl mx-auto flex flex-col gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <KairaLogo size={20} />
+              <span className="font-semibold text-foreground">Kaira</span>
+              <span className="hidden md:inline">· Central de comando para gestores de elite</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+              <Link to="/privacidade" className="hover:text-foreground">Privacidade</Link>
+              <Link to="/termos" className="hover:text-foreground">Termos</Link>
+              <Link to="/reembolso" className="hover:text-foreground">Reembolso</Link>
+              <a href="mailto:contato@kaira.app" className="hover:text-foreground">contato@kaira.app</a>
+            </div>
           </div>
-          <span>© {new Date().getFullYear()} Kaira. Todos os direitos reservados.</span>
+          <div className="text-[11px] text-muted-foreground/70 border-t border-border/30 pt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+            <span>© {new Date().getFullYear()} Kaira. Todos os direitos reservados.</span>
+            <span className="opacity-60">CNPJ XX.XXX.XXX/0001-XX · Atualizar quando MEI ativo</span>
+          </div>
         </div>
       </footer>
     </div>

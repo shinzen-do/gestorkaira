@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { errMsg } from "@/lib/errors";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,7 +58,7 @@ export function CreativeDialog({ trigger, adSetId, creative }: Props) {
         toast.success("Criativo criado");
       }
       setOpen(false);
-    } catch (e: any) { toast.error("Erro ao salvar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao salvar", { description: errMsg(e) }); }
     finally { setSaving(false); }
   };
 

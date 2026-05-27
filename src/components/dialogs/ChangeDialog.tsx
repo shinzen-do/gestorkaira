@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +46,7 @@ export function ChangeDialog({ trigger, targetType, targetId, targetName }: Prop
       toast.success("Mudança registrada", { description: targetName });
       setDescription(""); setDetails(""); setImpact("neutral"); setType("note");
       setOpen(false);
-    } catch (e: any) { toast.error("Erro ao registrar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao registrar", { description: errMsg(e) }); }
     finally { setSaving(false); }
   };
 

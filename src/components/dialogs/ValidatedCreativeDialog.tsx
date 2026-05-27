@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,7 @@ export function ValidatedCreativeDialog({ trigger, clientId }: { trigger: React.
       toast.success("Criativo validado salvo");
       setName(""); setUrl(""); setCtr(""); setRoas(""); setTags(""); setFormat("image");
       setOpen(false);
-    } catch (e: any) { toast.error("Erro ao salvar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao salvar", { description: errMsg(e) }); }
     finally { setSaving(false); }
   };
 

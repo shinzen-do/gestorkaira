@@ -53,8 +53,8 @@ export default function ResetPasswordPage() {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast({ title: "Senha fraca", description: "Use pelo menos 6 caracteres.", variant: "destructive" });
+    if (password.length < 8) {
+      toast({ title: "Senha fraca", description: "Use ao menos 8 caracteres.", variant: "destructive" });
       return;
     }
     if (password !== confirm) {
@@ -137,11 +137,11 @@ export default function ResetPasswordPage() {
                   <Input
                     id="password"
                     type={show ? "text" : "password"}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="Mínimo 8 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    minLength={6}
+                    minLength={8}
                     className="pl-10 pr-10 bg-surface-2 border-glass-border"
                   />
                   <button
@@ -165,7 +165,7 @@ export default function ResetPasswordPage() {
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
                     required
-                    minLength={6}
+                    minLength={8}
                     className="pl-10 bg-surface-2 border-glass-border"
                   />
                 </div>

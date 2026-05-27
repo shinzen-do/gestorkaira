@@ -58,11 +58,12 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors min-w-[260px]"
+        className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-secondary/60 border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors sm:min-w-[260px]"
+        aria-label="Buscar"
       >
-        <Search className="w-3.5 h-3.5" />
-        <span className="flex-1 text-left">Buscar clientes, campanhas, públicos…</span>
-        <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-background border border-border">⌘K</kbd>
+        <Search className="w-3.5 h-3.5 shrink-0" />
+        <span className="flex-1 text-left hidden sm:inline">Buscar clientes, campanhas, públicos…</span>
+        <kbd className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded bg-background border border-border">⌘K</kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput value={query} onValueChange={setQuery} placeholder="Digite para buscar…" />

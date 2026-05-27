@@ -6,13 +6,23 @@ import { Button } from "@/components/ui/button";
 import { ClientDialog } from "@/components/dialogs/ClientDialog";
 import { AudienceDialog } from "@/components/dialogs/AudienceDialog";
 import { MetricCard } from "@/components/shared/MetricCard";
+import { PacingAlertsBanner } from "@/components/PacingAlertsBanner";
+import { BillingPendingBanner } from "@/components/BillingPendingBanner";
+import { TutorialModal } from "@/components/TutorialModal";
+import { HomePageSkeleton } from "@/components/shared/PageSkeletons";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { format, parseISO, isBefore, startOfDay, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function HomePage() {
+  useDocumentTitle("Dashboard");
   const { clients, campaigns, audiences, calendarNotes, timelineEntries, loading } = useAppData();
   const { user } = useAuth();
+
+  if (loading && clients.length === 0 && campaigns.length === 0) {
+    return <HomePageSkeleton />;
+  }
 
   const today = startOfDay(new Date());
   const in7 = addDays(today, 8);
@@ -32,11 +42,16 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      <TutorialModal />
+
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-xs uppercase tracking-[0.2em] text-gold mb-2">Kaira</p>
         <h1 className="font-display text-4xl text-foreground tracking-tight">Bem-vindo{greeting}</h1>
         <p className="text-sm text-muted-foreground mt-2">Tráfego pago · Resultados reais</p>
       </motion.div>
+
+      <BillingPendingBanner />
+      <PacingAlertsBanner />
 
       {/* Quick metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

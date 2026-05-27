@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Plus, Trash2, Users as UsersIcon, Instagram, Facebook } from "lucide-react";
+import { Plus, Trash2, Users as UsersIcon, Instagram, Facebook, History } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +22,7 @@ interface Snap {
 }
 
 export default function FollowersPage() {
+  useDocumentTitle("Seguidores");
   const { user } = useAuth();
   const { clients } = useAppData();
   const [snaps, setSnaps] = useState<Snap[]>([]);
@@ -73,6 +77,14 @@ export default function FollowersPage() {
         <p className="text-sm text-muted-foreground mt-1">Registre quantos seguidores cada cliente tem em cada rede e acompanhe a evolução.</p>
       </motion.div>
 
+      {clients.length === 0 ? (
+        <EmptyState
+          icon={UsersIcon}
+          title="Cadastre um cliente primeiro"
+          description="Pra registrar seguidores você precisa de ao menos um cliente em Clientes."
+        />
+      ) : (
+      <>
       <Card className="glass-card"><CardContent className="pt-5 space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="space-y-1.5"><Label>Cliente</Label>
@@ -120,7 +132,13 @@ export default function FollowersPage() {
       <Card className="glass-card"><CardContent className="pt-5 space-y-2">
         <h2 className="text-sm font-semibold mb-2 flex items-center gap-2"><UsersIcon className="w-4 h-4 text-cobalt" /> Histórico</h2>
         {snaps.length === 0 ? (
-          <p className="text-xs text-muted-foreground py-4 text-center">Sem registros ainda.</p>
+          <div className="py-2">
+            <EmptyState
+              icon={History}
+              title="Sem registros ainda"
+              description="Registre o primeiro snapshot acima — depois você vê a evolução por rede aqui."
+            />
+          </div>
         ) : snaps.map((s) => {
           const cl = clients.find((c) => c.id === s.client_id);
           return (
@@ -132,11 +150,20 @@ export default function FollowersPage() {
                 {s.facebook != null && <span className="text-blue-400">FB {s.facebook.toLocaleString("pt-BR")}</span>}
                 {s.tiktok != null && <span>TT {s.tiktok.toLocaleString("pt-BR")}</span>}
               </span>
-              <button onClick={() => remove(s.id)} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-3.5 h-3.5" /></button>
+              <ConfirmDialog
+                title="Excluir registro?"
+                description={`Snapshot de ${cl?.name ?? "—"} em ${format(new Date(s.date), "dd MMM yyyy", { locale: ptBR })}.`}
+                confirmLabel="Excluir"
+                destructive
+                onConfirm={() => remove(s.id)}
+                trigger={<button className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-3.5 h-3.5" /></button>}
+              />
             </div>
           );
         })}
       </CardContent></Card>
+      </>
+      )}
     </div>
   );
 }

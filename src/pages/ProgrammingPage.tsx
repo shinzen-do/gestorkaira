@@ -8,10 +8,12 @@ import { useAppData } from "@/contexts/AppDataContext";
 import { ClientProgrammingSection, plannedTotal } from "@/components/ClientProgrammingSection";
 import { PlannedCampaignDialog } from "@/components/dialogs/PlannedCampaignDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const fmtBRL = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
 
 export default function ProgrammingPage() {
+  useDocumentTitle("Programação");
   const { clients, plannedCampaigns } = useAppData();
   const [query, setQuery] = useState("");
 

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { errMsg } from "@/lib/errors";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogFooter, DialogTrigger,
@@ -14,14 +15,22 @@ import { useDraft, useDialogPersist } from "@/hooks/useDraft";
 import { useState } from "react";
 
 interface Props {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   client?: Client;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function ClientDialog({ trigger, client }: Props) {
+export function ClientDialog({ trigger, client, open: openProp, onOpenChange }: Props) {
   const { createClient, updateClient } = useAppData();
   const draftKey = `client:${client?.id ?? "new"}`;
-  const [open, setOpen] = useDialogPersist(draftKey);
+  const [openInternal, setOpenInternal] = useDialogPersist(draftKey);
+  const controlled = openProp !== undefined;
+  const open = controlled ? openProp : openInternal;
+  const setOpen = (v: boolean) => {
+    if (controlled) onOpenChange?.(v);
+    else setOpenInternal(v);
+  };
   const [form, setForm, clearDraft] = useDraft(draftKey, {
     name: "", industry: "", budget: "0", notes: "",
     status: "active" as "active" | "paused" | "archived",
@@ -59,14 +68,14 @@ export function ClientDialog({ trigger, client }: Props) {
       }
       clearDraft();
       setOpen(false);
-    } catch (e: any) {
-      toast.error("Erro ao salvar", { description: e.message });
+    } catch (e) {
+      toast.error("Erro ao salvar", { description: errMsg(e) });
     } finally { setSaving(false); }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{client ? "Editar cliente" : "Novo cliente"}</DialogTitle>

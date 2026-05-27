@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# MCP config — contém PAT em texto plano, NUNCA commitar
+.mcp.json
+
+# Supabase CLI runtime artifacts
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

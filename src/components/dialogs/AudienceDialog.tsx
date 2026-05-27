@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,14 +12,22 @@ import { toast } from "sonner";
 import { useDraft, useDialogPersist } from "@/hooks/useDraft";
 
 interface Props {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   audience?: Audience;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function AudienceDialog({ trigger, audience }: Props) {
+export function AudienceDialog({ trigger, audience, open: openProp, onOpenChange }: Props) {
   const { createAudience, updateAudience, linkAudienceToCampaigns, audienceCampaigns, clients, campaigns } = useAppData();
   const draftKey = `audience:${audience?.id ?? "new"}`;
-  const [open, setOpen] = useDialogPersist(draftKey);
+  const [openInternal, setOpenInternal] = useDialogPersist(draftKey);
+  const controlled = openProp !== undefined;
+  const open = controlled ? openProp : openInternal;
+  const setOpen = (v: boolean) => {
+    if (controlled) onOpenChange?.(v);
+    else setOpenInternal(v);
+  };
   const [form, setForm, clearDraft] = useDraft(draftKey, {
     name: "", description: "", gender: "all" as Gender,
     ageMin: "18", ageMax: "65", interests: "", size: "",
@@ -67,13 +76,13 @@ export function AudienceDialog({ trigger, audience }: Props) {
       }
       clearDraft();
       setOpen(false);
-    } catch (e: any) { toast.error("Erro ao salvar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao salvar", { description: errMsg(e) }); }
     finally { setSaving(false); }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{audience ? "Editar público" : "Novo público"}</DialogTitle>

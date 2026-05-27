@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { errMsg } from "@/lib/errors";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -52,7 +53,7 @@ export function AdSetDialog({ trigger, campaignId, adSet }: Props) {
       }
       clearDraft();
       setOpen(false);
-    } catch (e: any) { toast.error("Erro ao salvar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao salvar", { description: errMsg(e) }); }
     finally { setSaving(false); }
   };
 

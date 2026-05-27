@@ -1,4 +1,5 @@
 import { useEffect, useState, ReactNode } from "react";
+import { errMsg } from "@/lib/errors";
 import { format, parseISO, differenceInCalendarDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -79,8 +80,8 @@ export function PlannedCampaignDialog({ trigger, clientId, planned }: Props) {
         toast.success("Campanha programada");
       }
       setOpen(false);
-    } catch (e: any) {
-      toast.error("Erro ao salvar", { description: e.message });
+    } catch (e) {
+      toast.error("Erro ao salvar", { description: errMsg(e) });
     }
   };
 

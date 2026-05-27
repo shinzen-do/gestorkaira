@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { KairaLogo } from "@/components/shared/KairaLogo";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -197,6 +198,14 @@ export default function LoginPage() {
           </div>
 
           <div className="glass-card p-8 backdrop-blur-xl">
+            <GoogleSignInButton />
+
+            <div className="flex items-center gap-3 my-5">
+              <div className="h-px flex-1 bg-glass-border" />
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">ou com email</span>
+              <div className="h-px flex-1 bg-glass-border" />
+            </div>
+
             <form onSubmit={handleLogin} className="space-y-5" noValidate>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs uppercase tracking-wider text-muted-foreground">

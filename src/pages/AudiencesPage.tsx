@@ -8,6 +8,8 @@ import { useAppData, type Audience } from "@/contexts/AppDataContext";
 import { AudienceDialog } from "@/components/dialogs/AudienceDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { CardGridSkeleton } from "@/components/shared/PageSkeletons";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { toast } from "sonner";
 
@@ -77,6 +79,7 @@ function AudienceCard({ a }: { a: Audience }) {
 }
 
 export default function AudiencesPage() {
+  useDocumentTitle("Públicos");
   const { audiences, loading } = useAppData();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
@@ -109,7 +112,7 @@ export default function AudiencesPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar nome, descrição ou interesse..." className="pl-9" />
         </div>
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
           <TabsList>
             <TabsTrigger value="all">Todos <span className="ml-1 text-[10px] text-muted-foreground">{audiences.length}</span></TabsTrigger>
             <TabsTrigger value="active">Ativos <span className="ml-1 text-[10px] text-muted-foreground">{audiences.filter(a=>a.status==="active").length}</span></TabsTrigger>
@@ -118,8 +121,10 @@ export default function AudiencesPage() {
         </Tabs>
       </div>
 
+      {loading && audiences.length === 0 ? (
+        <CardGridSkeleton count={4} />
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {loading && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Carregando...</p>}
         {!loading && filtered.length === 0 && (
           query || filter !== "all" ? (
             <div className="glass-card p-8 text-center text-sm text-muted-foreground col-span-full">Nenhum público encontrado.</div>
@@ -134,6 +139,7 @@ export default function AudiencesPage() {
         )}
         {filtered.map((a) => <AudienceCard key={a.id} a={a} />)}
       </div>
+      )}
     </div>
   );
 }

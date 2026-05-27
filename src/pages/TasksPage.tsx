@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { motion } from "framer-motion";
 import { format, parseISO, isToday, isBefore, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppData } from "@/contexts/AppDataContext";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,6 +20,7 @@ interface AiTask {
 }
 
 export default function TasksPage() {
+  useDocumentTitle("Tarefas");
   const { user } = useAuth();
   const { plannedCampaigns, clients, updatePlannedCampaign, calendarNotes, toggleCalendarNote } = useAppData();
   const [aiTasks, setAiTasks] = useState<AiTask[]>([]);
@@ -59,8 +63,8 @@ export default function TasksPage() {
       setAiTasks((p) => [...((inserted ?? []) as AiTask[]), ...p]);
       setText("");
       toast.success(`${tasks.length} tarefa(s) criadas pela IA`);
-    } catch (e: any) {
-      toast.error("Erro com a IA", { description: e.message });
+    } catch (e) {
+      toast.error("Erro com a IA", { description: errMsg(e) });
     } finally { setThinking(false); }
   };
 
@@ -120,7 +124,14 @@ export default function TasksPage() {
         {aiTasks.map((t) => (
           <Row key={t.id} title={t.title} subtitle={t.description ?? undefined} done={t.done}>
             <Button size="sm" variant="ghost" onClick={() => toggleAi(t)}>{t.done ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Circle className="w-4 h-4" />}</Button>
-            <Button size="sm" variant="ghost" onClick={() => removeAi(t.id)}><Trash2 className="w-4 h-4" /></Button>
+            <ConfirmDialog
+              title="Excluir tarefa?"
+              description={t.title}
+              confirmLabel="Excluir"
+              destructive
+              onConfirm={() => removeAi(t.id)}
+              trigger={<Button size="sm" variant="ghost"><Trash2 className="w-4 h-4" /></Button>}
+            />
           </Row>
         ))}
       </Section>

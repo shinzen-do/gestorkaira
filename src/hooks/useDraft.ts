@@ -25,13 +25,10 @@ export function useDraft<T>(key: string, initial: T) {
   return [value, setValue, clear] as const;
 }
 
-export function useDialogPersist(key: string) {
-  const fullKey = PREFIX + "open:" + key;
-  const [open, setOpen] = useState<boolean>(() => {
-    try { return localStorage.getItem(fullKey) === "1"; } catch { return false; }
-  });
-  useEffect(() => {
-    try { open ? localStorage.setItem(fullKey, "1") : localStorage.removeItem(fullKey); } catch {}
-  }, [fullKey, open]);
+// Antes persistia "open" no localStorage; isso reabria dialog após reload e em
+// alguns fluxos deixava o overlay preto preso na tela após criar/salvar. Mantemos
+// só estado em memória — o useDraft continua persistindo os valores do form.
+export function useDialogPersist(_key: string) {
+  const [open, setOpen] = useState(false);
   return [open, setOpen] as const;
 }

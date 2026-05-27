@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -223,8 +223,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [calendarNotes, setCalendarNotes] = useState<CalendarNote[]>([]);
   const [plannedCampaigns, setPlannedCampaigns] = useState<PlannedCampaign[]>([]);
+  const fetchSeqRef = useRef(0);
 
   const refresh = useCallback(async () => {
+    const seq = ++fetchSeqRef.current;
     if (!user) {
       setClients([]); setCampaigns([]); setAdSets([]); setCreatives([]);
       setAudiences([]); setAudienceCampaigns([]); setValidatedCreatives([]);
@@ -240,11 +242,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       supabase.from("creatives").select("*").order("created_at", { ascending: false }),
       supabase.from("audiences").select("*").order("created_at", { ascending: false }),
       supabase.from("audience_campaigns").select("*"),
-      supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }),
-      supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }),
+      supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }).limit(200),
+      supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }).limit(300),
       supabase.from("calendar_notes").select("*").order("date", { ascending: true }),
       supabase.from("planned_campaigns").select("*").order("start_date", { ascending: true }),
     ]);
+    // Descarta resultado de refresh anterior se outro foi disparado no meio (evita race quando user troca rápido).
+    if (seq !== fetchSeqRef.current) return;
     setClients((c.data ?? []) as Client[]);
     setCampaigns((cp.data ?? []) as Campaign[]);
     setAdSets((as.data ?? []) as AdSet[]);

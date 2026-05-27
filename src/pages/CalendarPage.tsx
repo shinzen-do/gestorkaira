@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { motion } from "framer-motion";
 import { format, isSameDay, isBefore, startOfDay, addDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -15,6 +16,8 @@ import { useAppData, type CalendarPriority, type CalendarLinkType, type Calendar
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const priorityStyles: Record<CalendarPriority, string> = {
   low: "text-muted-foreground bg-secondary border-border",
@@ -48,7 +51,7 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
       toast.success("Anotação criada");
       setTitle(""); setDescription(""); setPriority("medium"); setLinkType("none"); setLinkId(undefined);
       setOpen(false);
-    } catch (e: any) { toast.error("Erro", { description: e.message }); }
+    } catch (e) { toast.error("Erro", { description: errMsg(e) }); }
   };
 
   const campsLabeled = campaigns.map((c) => {
@@ -128,6 +131,7 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
 }
 
 export default function CalendarPage() {
+  useDocumentTitle("Calendário");
   const { calendarNotes, toggleCalendarNote, deleteCalendarNote, clients, audiences, campaigns, timelineEntries, plannedCampaigns } = useAppData();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
@@ -215,10 +219,18 @@ export default function CalendarPage() {
           </div>
           {n.description && <p className="text-xs text-muted-foreground mt-1.5">{n.description}</p>}
         </div>
-        <button onClick={() => { deleteCalendarNote(n.id); toast.success("Anotação removida"); }}
-          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0">
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        <ConfirmDialog
+          title="Excluir anotação?"
+          description={`"${n.title}" será removida do calendário.`}
+          confirmLabel="Excluir"
+          destructive
+          onConfirm={() => deleteCalendarNote(n.id).then(() => toast.success("Anotação removida"))}
+          trigger={
+            <button className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0">
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          }
+        />
       </motion.div>
     );
   };

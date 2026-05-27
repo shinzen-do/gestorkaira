@@ -10,6 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppData } from "@/contexts/AppDataContext";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ListSkeleton } from "@/components/shared/PageSkeletons";
+import { Wallet as WalletIcon } from "lucide-react";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 interface MonthlyBudget {
   id: string;
@@ -56,6 +60,7 @@ function pacingColor(diff: number) {
 }
 
 export default function PacingPage() {
+  useDocumentTitle("Pacing");
   const { user } = useAuth();
   const { clients } = useAppData();
   const { toast } = useToast();
@@ -108,12 +113,26 @@ export default function PacingPage() {
   const refresh = async () => {
     if (!user) return;
     setLoading(true);
-    const [b, s] = await Promise.all([
-      supabase.from("monthly_budgets").select("*").eq("year", year).eq("month", month),
-      supabase.from("daily_spends").select("*"),
-    ]);
-    setBudgets((b.data ?? []) as MonthlyBudget[]);
-    setSpends((s.data ?? []) as DailySpend[]);
+
+    const { data: bData } = await supabase
+      .from("monthly_budgets")
+      .select("*")
+      .eq("year", year)
+      .eq("month", month);
+    const budgetsRows = (bData ?? []) as MonthlyBudget[];
+    setBudgets(budgetsRows);
+
+    if (budgetsRows.length === 0) {
+      setSpends([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data: sData } = await supabase
+      .from("daily_spends")
+      .select("*")
+      .in("monthly_budget_id", budgetsRows.map((b) => b.id));
+    setSpends((sData ?? []) as DailySpend[]);
     setLoading(false);
   };
 
@@ -254,13 +273,13 @@ export default function PacingPage() {
       </Card>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
+        <ListSkeleton count={3} />
       ) : clients.length === 0 ? (
-        <Card className="glass-card"><CardContent className="py-12 text-center text-muted-foreground">
-          Nenhum cliente cadastrado. Crie um cliente em "Clientes" para começar a controlar o orçamento.
-        </CardContent></Card>
+        <EmptyState
+          icon={WalletIcon}
+          title="Nenhum cliente cadastrado"
+          description="Cadastre um cliente em Clientes para começar a controlar orçamento e ritmo de gasto."
+        />
       ) : (
         <div className="grid gap-4">
           {clients.map((client) => {

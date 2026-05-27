@@ -17,6 +17,8 @@ import { ValidatedCreativeDialog } from "@/components/dialogs/ValidatedCreativeD
 import { ChangeDialog } from "@/components/dialogs/ChangeDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ListSkeleton } from "@/components/shared/PageSkeletons";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { ClientProgrammingSection } from "@/components/ClientProgrammingSection";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
@@ -425,6 +427,7 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
 
 // ---------- Page ----------
 export default function ClientsPage() {
+  useDocumentTitle("Clientes");
   const { clients, loading } = useAppData();
   const [params] = useSearchParams();
   const focusId = params.get("focus");
@@ -463,7 +466,7 @@ export default function ClientsPage() {
       </div>
 
       <div className="space-y-3">
-        {loading && <div className="text-center text-sm text-muted-foreground py-8">Carregando...</div>}
+        {loading && clients.length === 0 && <ListSkeleton count={4} />}
         {!loading && filtered.length === 0 && (
           query ? (
             <div className="glass-card p-8 text-center text-sm text-muted-foreground">Nenhum cliente encontrado.</div>

@@ -1,4 +1,4 @@
-import { Home, Users, History, Settings, Calendar, Target, Activity, Sparkles } from "lucide-react";
+import { Home, Users, History, Settings, Calendar, Target, Activity, Sparkles, ListTodo, TrendingUp } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -19,6 +19,8 @@ export function KairaSidebar() {
     { title: "Programação", url: "/programacao", icon: Sparkles },
     { title: "Pacing", url: "/pacing", icon: Activity },
     { title: t("nav.calendar"), url: "/calendar", icon: Calendar },
+    { title: t("nav.tasks"), url: "/tasks", icon: ListTodo },
+    { title: t("nav.followers"), url: "/followers", icon: TrendingUp },
     { title: t("nav.timeline"), url: "/timeline", icon: History },
   ];
 

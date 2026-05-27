@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { errMsg } from "@/lib/errors";
 import { motion } from "framer-motion";
-import { User, Palette, Languages, LogOut, Save, Sun, Moon } from "lucide-react";
+import { User, Palette, Languages, LogOut, Save, Sun, Moon, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
@@ -12,21 +14,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function SettingsPage() {
+  useDocumentTitle("Configurações");
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
+  const [historyEnabled, setHistoryEnabled] = useState(false);
+  const [historySaving, setHistorySaving] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
       if (!user) return;
-      const { data } = await supabase.from("user_settings").select("display_name").eq("user_id", user.id).maybeSingle();
+      const { data } = await supabase
+        .from("user_settings")
+        .select("display_name, history_tracking_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
       setDisplayName(data?.display_name ?? user.user_metadata?.full_name ?? "");
+      setHistoryEnabled(Boolean(data?.history_tracking_enabled));
     })();
   }, [user]);
 
@@ -41,13 +52,30 @@ export default function SettingsPage() {
       if (error) throw error;
       await supabase.auth.updateUser({ data: { full_name: displayName.trim() } });
       toast.success("Perfil atualizado");
-    } catch (e: any) { toast.error("Erro ao salvar", { description: e.message }); }
+    } catch (e) { toast.error("Erro ao salvar", { description: errMsg(e) }); }
     finally { setSaving(false); }
+  };
+
+  const toggleHistory = async (next: boolean) => {
+    if (!user) return;
+    setHistoryEnabled(next);
+    setHistorySaving(true);
+    const { error } = await supabase.from("user_settings").upsert(
+      { user_id: user.id, history_tracking_enabled: next },
+      { onConflict: "user_id" },
+    );
+    setHistorySaving(false);
+    if (error) {
+      setHistoryEnabled(!next);
+      toast.error("Erro ao alterar Modo Histórico", { description: error.message });
+    } else {
+      toast.success(next ? "Modo Histórico ativado" : "Modo Histórico desativado");
+    }
   };
 
   const handleSignOut = async () => { await signOut(); navigate("/login"); };
 
-  const ThemeBtn = ({ value, label, icon: Icon }: { value: typeof theme; label: string; icon: any }) => (
+  const ThemeBtn = ({ value, label, icon: Icon }: { value: typeof theme; label: string; icon: React.ComponentType<{ className?: string }> }) => (
     <button onClick={() => setTheme(value)}
       className={cn("flex-1 flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-colors",
         theme === value ? "border-gold bg-gold/10 text-foreground" : "border-border bg-secondary/30 text-muted-foreground hover:text-foreground hover:border-border")}>
@@ -87,20 +115,42 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      {/* Idioma */}
-      <Card className="p-5 space-y-4">
+      {/* Idioma — desabilitado até i18n estar completo (semana 4+) */}
+      <Card className="p-5 space-y-4 opacity-60">
         <div className="flex items-center gap-2">
           <Languages className="w-4 h-4 text-gold" />
           <h2 className="text-sm font-semibold text-foreground">{t("settings.language")}</h2>
+          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/30">Em breve</span>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <p className="text-xs text-muted-foreground">
+          Por enquanto o Kaira está em português. Inglês e espanhol entram na próxima fase.
+        </p>
+        <div className="grid grid-cols-3 gap-2 pointer-events-none">
           {(["pt", "en", "es"] as Language[]).map((l) => (
-            <button key={l} onClick={() => setLang(l)}
-              className={cn("p-3 rounded-lg border text-sm font-medium transition-colors",
-                lang === l ? "border-gold bg-gold/10 text-foreground" : "border-border bg-secondary/30 text-muted-foreground hover:text-foreground")}>
+            <button key={l} disabled
+              className={cn("p-3 rounded-lg border text-sm font-medium",
+                l === "pt" ? "border-gold bg-gold/10 text-foreground" : "border-border bg-secondary/30 text-muted-foreground")}>
               {l === "pt" ? "Português" : l === "en" ? "English" : "Español"}
             </button>
           ))}
+        </div>
+      </Card>
+
+      {/* Modo Histórico */}
+      <Card className="p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <History className="w-4 h-4 text-gold" />
+          <h2 className="text-sm font-semibold text-foreground">Modo Histórico</h2>
+        </div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-sm text-foreground">Registrar mudanças automaticamente</p>
+            <p className="text-xs text-muted-foreground">
+              Quando ligado, toda alteração em cliente, campanha, conjunto e público gera entrada no Histórico.
+              Deixe desligado durante o setup inicial — ligue quando o cenário estiver pronto.
+            </p>
+          </div>
+          <Switch checked={historyEnabled} onCheckedChange={toggleHistory} disabled={historySaving} />
         </div>
       </Card>
 

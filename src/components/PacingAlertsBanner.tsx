@@ -19,12 +19,25 @@ export function PacingAlertsBanner() {
     (async () => {
       if (!user) return;
       const today = new Date();
-      const [b, s] = await Promise.all([
-        supabase.from("monthly_budgets").select("id, client_id, total_budget").eq("year", today.getFullYear()).eq("month", today.getMonth() + 1),
-        supabase.from("daily_spends").select("*"),
-      ]);
-      setBudgets((b.data ?? []) as MB[]);
-      setSpends((s.data ?? []) as DailySpend[]);
+      const { data: bData } = await supabase
+        .from("monthly_budgets")
+        .select("id, client_id, total_budget")
+        .eq("year", today.getFullYear())
+        .eq("month", today.getMonth() + 1);
+
+      const budgetsRows = (bData ?? []) as MB[];
+      setBudgets(budgetsRows);
+
+      if (budgetsRows.length === 0) {
+        setSpends([]);
+        return;
+      }
+
+      const { data: sData } = await supabase
+        .from("daily_spends")
+        .select("*")
+        .in("monthly_budget_id", budgetsRows.map((b) => b.id));
+      setSpends((sData ?? []) as DailySpend[]);
     })();
   }, [user]);
 

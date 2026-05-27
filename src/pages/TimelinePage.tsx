@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { History, ArrowUp, ArrowDown, Minus, Download, FileText, Filter } from "lucide-react";
 import { useAppData, type TimelineEntry, type TargetType } from "@/contexts/AppDataContext";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ const targetLabels: Record<TargetType, string> = {
 type EnrichedEntry = TimelineEntry & { context: string; clientName: string; campaignName: string; adSetName: string };
 
 export default function TimelinePage() {
+  useDocumentTitle("Timeline");
   const { timelineEntries, clients, campaigns, adSets, audiences, loading } = useAppData();
   const { toast } = useToast();
 
