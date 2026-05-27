@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import {
@@ -36,7 +36,9 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const prefilledEmail = (location.state as { email?: string } | null)?.email ?? "";
+  const [email, setEmail] = useState(prefilledEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
@@ -44,6 +46,12 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (prefilledEmail) {
+      window.setTimeout(() => document.getElementById("password")?.focus(), 100);
+    }
+  }, [prefilledEmail]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

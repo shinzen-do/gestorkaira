@@ -121,26 +121,38 @@ export function AudienceDialog({ trigger, audience, open: openProp, onOpenChange
           </div>
 
           <div className="space-y-2 pt-2 border-t border-border">
-            <Label>Ativar nas campanhas</Label>
+            <div className="flex items-center justify-between">
+              <Label>Ativar nas campanhas</Label>
+              {campaigns.length > 0 && (
+                <span className="text-[11px] text-muted-foreground">
+                  {form.selectedCampaigns.length} de {campaigns.length} selecionada{campaigns.length === 1 ? "" : "s"}
+                </span>
+              )}
+            </div>
             {campaigns.length === 0 ? (
               <p className="text-xs text-muted-foreground">Você ainda não tem campanhas. Crie uma campanha em um cliente para vincular.</p>
             ) : (
-              <div className="max-h-40 overflow-y-auto space-y-1 rounded-lg border border-border p-2">
-                {clients.map((cl) => {
-                  const camps = campaigns.filter((c) => c.client_id === cl.id);
-                  if (camps.length === 0) return null;
-                  return (
-                    <div key={cl.id} className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-1">{cl.name}</p>
-                      {camps.map((c) => (
-                        <label key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-secondary/50 cursor-pointer">
-                          <Checkbox checked={form.selectedCampaigns.includes(c.id)} onCheckedChange={() => toggleCampaign(c.id)} />
-                          <span className="text-sm text-foreground">{c.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  );
-                })}
+              <div className="relative">
+                <div className="max-h-72 overflow-y-auto space-y-1 rounded-lg border border-border p-2 bg-secondary/20">
+                  {clients.map((cl) => {
+                    const camps = campaigns.filter((c) => c.client_id === cl.id);
+                    if (camps.length === 0) return null;
+                    return (
+                      <div key={cl.id} className="space-y-1">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-1 pt-1">{cl.name}</p>
+                        {camps.map((c) => (
+                          <label key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-secondary/60 cursor-pointer">
+                            <Checkbox checked={form.selectedCampaigns.includes(c.id)} onCheckedChange={() => toggleCampaign(c.id)} />
+                            <span className="text-sm text-foreground">{c.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+                {campaigns.length > 6 && (
+                  <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card/95 to-transparent pointer-events-none rounded-b-lg" aria-hidden />
+                )}
               </div>
             )}
           </div>

@@ -53,6 +53,41 @@ export default function HomePage() {
       <BillingPendingBanner />
       <PacingAlertsBanner />
 
+      {clients.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="relative glass-card border-gold-soft p-6 overflow-hidden"
+        >
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-50 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 50% at 20% 0%, hsl(var(--gold) / 0.10), transparent 70%)",
+            }}
+          />
+          <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/30 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5 text-gold" strokeWidth={1.5} />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Comece por aqui</p>
+              <p className="font-display text-xl text-foreground tracking-tight">
+                Cadastre seu primeiro cliente
+              </p>
+              <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                A partir dele você organiza campanhas, conjuntos, criativos e públicos. Leva 30 segundos.
+              </p>
+            </div>
+            <ClientDialog trigger={
+              <Button className="shrink-0"><Plus className="w-4 h-4 mr-1.5" /> Novo cliente</Button>
+            } />
+          </div>
+        </motion.div>
+      )}
+
       {/* Quick metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard label="Clientes" value={String(clients.length)} icon={<Users className="w-4 h-4" />} hint={`${clients.filter((c) => c.status === "active").length} ativos`} />
@@ -145,13 +180,6 @@ export default function HomePage() {
         </section>
       </div>
 
-      {clients.length === 0 && !loading && (
-        <div className="glass-card p-8 text-center border-gold-soft">
-          <p className="font-display text-xl text-foreground mb-2">Comece criando seu primeiro cliente</p>
-          <p className="text-sm text-muted-foreground mb-4">A partir dele você organiza campanhas, conjuntos, criativos e públicos.</p>
-          <ClientDialog trigger={<Button><Plus className="w-4 h-4 mr-1.5" /> Criar primeiro cliente</Button>} />
-        </div>
-      )}
     </div>
   );
 }

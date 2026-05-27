@@ -65,8 +65,15 @@ export default function SignupPage() {
     // Auto-login após signup (auto-confirm está ativo)
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {
-      toast({ title: "Conta criada!", description: "Faça login para continuar." });
-      navigate("/login");
+      const needsEmailConfirm = signInError.message?.toLowerCase().includes("email") ||
+                                 signInError.message?.toLowerCase().includes("confirm");
+      toast({
+        title: "Conta criada!",
+        description: needsEmailConfirm
+          ? "Confirme seu email — enviamos um link pra ativar o acesso."
+          : "Faça login com seus dados pra continuar.",
+      });
+      navigate("/login", { state: { email } });
     } else if (selectedPlan && selectedPlan !== "free") {
       toast({
         title: "Vaga reservada",

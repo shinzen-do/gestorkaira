@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { errMsg } from "@/lib/errors";
 import { motion } from "framer-motion";
-import { User, Palette, Languages, LogOut, Save, Sun, Moon, History } from "lucide-react";
+import { User, Palette, LogOut, Save, Sun, Moon, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useLanguage, type Language } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ export default function SettingsPage() {
   useDocumentTitle("Configurações");
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { lang, setLang, t } = useLanguage();
+  const { lang, t } = useLanguage();
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
@@ -112,27 +112,6 @@ export default function SettingsPage() {
         <div className="flex gap-2">
           <ThemeBtn value="light" label={t("settings.theme.light")} icon={Sun} />
           <ThemeBtn value="dark" label={t("settings.theme.dark")} icon={Moon} />
-        </div>
-      </Card>
-
-      {/* Idioma — desabilitado até i18n estar completo (semana 4+) */}
-      <Card className="p-5 space-y-4 opacity-60">
-        <div className="flex items-center gap-2">
-          <Languages className="w-4 h-4 text-gold" />
-          <h2 className="text-sm font-semibold text-foreground">{t("settings.language")}</h2>
-          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/30">Em breve</span>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Por enquanto o Kaira está em português. Inglês e espanhol entram na próxima fase.
-        </p>
-        <div className="grid grid-cols-3 gap-2 pointer-events-none">
-          {(["pt", "en", "es"] as Language[]).map((l) => (
-            <button key={l} disabled
-              className={cn("p-3 rounded-lg border text-sm font-medium",
-                l === "pt" ? "border-gold bg-gold/10 text-foreground" : "border-border bg-secondary/30 text-muted-foreground")}>
-              {l === "pt" ? "Português" : l === "en" ? "English" : "Español"}
-            </button>
-          ))}
         </div>
       </Card>
 

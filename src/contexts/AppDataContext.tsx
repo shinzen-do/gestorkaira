@@ -236,16 +236,16 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
     setLoading(true);
     const [c, cp, as, cr, au, ac, vc, te, cn, pc] = await Promise.all([
-      supabase.from("clients").select("*").order("created_at", { ascending: false }),
-      supabase.from("campaigns").select("*").order("created_at", { ascending: false }),
-      supabase.from("ad_sets").select("*").order("created_at", { ascending: false }),
-      supabase.from("creatives").select("*").order("created_at", { ascending: false }),
-      supabase.from("audiences").select("*").order("created_at", { ascending: false }),
-      supabase.from("audience_campaigns").select("*"),
+      supabase.from("clients").select("*").order("created_at", { ascending: false }).limit(500),
+      supabase.from("campaigns").select("*").order("created_at", { ascending: false }).limit(2000),
+      supabase.from("ad_sets").select("*").order("created_at", { ascending: false }).limit(5000),
+      supabase.from("creatives").select("*").order("created_at", { ascending: false }).limit(10000),
+      supabase.from("audiences").select("*").order("created_at", { ascending: false }).limit(500),
+      supabase.from("audience_campaigns").select("*").limit(5000),
       supabase.from("validated_creatives").select("*").order("validated_at", { ascending: false }).limit(200),
       supabase.from("timeline_entries").select("*").order("occurred_at", { ascending: false }).order("created_at", { ascending: false }).limit(300),
-      supabase.from("calendar_notes").select("*").order("date", { ascending: true }),
-      supabase.from("planned_campaigns").select("*").order("start_date", { ascending: true }),
+      supabase.from("calendar_notes").select("*").order("date", { ascending: true }).limit(1000),
+      supabase.from("planned_campaigns").select("*").order("start_date", { ascending: true }).limit(500),
     ]);
     // Descarta resultado de refresh anterior se outro foi disparado no meio (evita race quando user troca rápido).
     if (seq !== fetchSeqRef.current) return;

@@ -465,6 +465,9 @@ export default function PacingPage() {
                           </span>
                         )}
                       </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        {isCurrentMonth ? `Pré-preenchido com hoje (dia ${effectiveDay}). Mude se for registrar outro dia.` : `Dia 1 a ${totalDays} desse mês.`}
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs uppercase tracking-wider text-muted-foreground">Total gasto no mês até esse dia</Label>

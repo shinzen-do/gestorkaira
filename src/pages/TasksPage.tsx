@@ -86,8 +86,18 @@ export default function TasksPage() {
 
       <Card className="glass-card border-cobalt/30"><CardContent className="pt-5 space-y-3">
         <div className="flex items-center gap-2"><Wand2 className="w-4 h-4 text-cobalt" /><h2 className="text-sm font-semibold">Pedir à IA para resumir em tarefas</h2></div>
-        <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="Cole mensagens, briefing ou anotações. A IA vai transformar em tarefas." />
-        <div className="flex justify-end"><Button onClick={submitAi} disabled={thinking}>{thinking ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Analisando...</> : <><Sparkles className="w-4 h-4 mr-1.5" /> Gerar tarefas</>}</Button></div>
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={4}
+          placeholder={`Ex.: Conversei com o cliente Acme. Quer pausar a campanha de Black Friday segunda-feira e subir 3 criativos novos até quarta. Orçamento sobe pra R$ 200/dia em dezembro.`}
+        />
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <p className="text-[11px] text-muted-foreground max-w-md">
+            Funciona melhor com texto corrido: briefings, mensagens de WhatsApp, anotações de reunião. A IA extrai prazos e prioridades.
+          </p>
+          <Button onClick={submitAi} disabled={thinking || !text.trim()}>{thinking ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Analisando...</> : <><Sparkles className="w-4 h-4 mr-1.5" /> Gerar tarefas</>}</Button>
+        </div>
       </CardContent></Card>
 
       <Section title="Campanhas para ativar hoje" icon={<Play className="w-4 h-4 text-emerald-400" />} empty="Nada para ativar.">
