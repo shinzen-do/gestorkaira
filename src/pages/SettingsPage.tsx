@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { SecuritySection } from "@/components/settings/SecuritySection";
+import { ConnectorsSection } from "@/components/settings/ConnectorsSection";
 
 export default function SettingsPage() {
   useDocumentTitle("Configurações");
@@ -109,6 +110,8 @@ export default function SettingsPage() {
       </motion.div>
 
       <SecuritySection />
+
+      <ConnectorsSection />
 
       {/* Aparência */}
       <Card className="p-5 space-y-4">
