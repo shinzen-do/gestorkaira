@@ -25,6 +25,7 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -32,6 +33,10 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!accepted) {
+      toast({ title: "Aceite os termos", description: "Você precisa aceitar os Termos e a Política de Privacidade.", variant: "destructive" });
+      return;
+    }
     if (password.length < 8) {
       toast({ title: "Senha fraca", description: "Use ao menos 8 caracteres.", variant: "destructive" });
       return;
@@ -171,7 +176,23 @@ export default function SignupPage() {
                 className="bg-surface-2 border-glass-border"
               />
             </div>
-            <Button type="submit" className="w-full glow-cobalt" disabled={loading}>
+            <label className="flex items-start gap-2.5 text-xs text-muted-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-glass-border bg-surface-2 text-cobalt focus:ring-cobalt/40 cursor-pointer accent-cobalt"
+              />
+              <span>
+                Li e aceito os{" "}
+                <Link to="/termos" target="_blank" className="text-cobalt hover:underline">Termos de Uso</Link>
+                {" "}e a{" "}
+                <Link to="/privacidade" target="_blank" className="text-cobalt hover:underline">Política de Privacidade</Link>
+                .
+              </span>
+            </label>
+
+            <Button type="submit" className="w-full glow-cobalt" disabled={loading || !accepted}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Criar Conta"}
             </Button>
           </form>

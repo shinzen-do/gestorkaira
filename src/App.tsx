@@ -11,6 +11,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CookiesBanner } from "@/components/CookiesBanner";
 
 // Eager: páginas de entrada (Landing/auth) — LCP crítico
 import LandingPage from "./pages/LandingPage";
@@ -86,6 +87,7 @@ const App = () => (
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                <CookiesBanner />
               </AppDataProvider>
             </AuthProvider>
           </BrowserRouter>

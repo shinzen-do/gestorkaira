@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { PricingCheckoutModal, type PlanInfo } from "@/components/PricingCheckoutModal";
 import {
   GitBranch,
   BarChart3,
@@ -200,6 +202,21 @@ const faqs = [
 ];
 
 export default function LandingPage() {
+  const [pendingPlan, setPendingPlan] = useState<PlanInfo | null>(null);
+
+  const handlePlanCta = (plan: typeof pricingPlans[number]) => {
+    if (plan.href === "/login" || !plan.href.includes("plan=")) return;
+    const key = plan.href.split("plan=")[1] as PlanInfo["key"];
+    setPendingPlan({
+      key,
+      name: plan.name,
+      price: plan.price,
+      period: plan.period,
+      tagline: plan.description,
+      features: plan.features,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Nav */}
@@ -608,16 +625,27 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                <Button
-                  asChild
-                  variant={plan.highlight ? "default" : "outline"}
-                  className={`w-full ${plan.highlight ? "glow-cobalt" : ""}`}
-                >
-                  <Link to={plan.href}>
+                {plan.href.includes("plan=") ? (
+                  <Button
+                    variant={plan.highlight ? "default" : "outline"}
+                    className={`w-full ${plan.highlight ? "glow-cobalt" : ""}`}
+                    onClick={() => handlePlanCta(plan)}
+                  >
                     {plan.cta}
                     <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </Link>
-                </Button>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    variant={plan.highlight ? "default" : "outline"}
+                    className={`w-full ${plan.highlight ? "glow-cobalt" : ""}`}
+                  >
+                    <Link to={plan.href}>
+                      {plan.cta}
+                      <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    </Link>
+                  </Button>
+                )}
               </motion.div>
             ))}
           </div>
@@ -728,6 +756,12 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <PricingCheckoutModal
+        plan={pendingPlan}
+        open={!!pendingPlan}
+        onOpenChange={(o) => !o && setPendingPlan(null)}
+      />
     </div>
   );
 }

@@ -61,8 +61,14 @@ declare global {
   }
 }
 
+function hasMarketingConsent(): boolean {
+  if (typeof window === "undefined") return false
+  try { return window.localStorage.getItem("kaira_cookies_consent") === "all" } catch { return false }
+}
+
 export function initMetaPixel(pixelId: string | undefined = import.meta.env.VITE_META_PIXEL_ID as string | undefined) {
   if (!pixelId || typeof window === "undefined") return
+  if (!hasMarketingConsent()) return // LGPD: só inicializa Pixel com consentimento
   if (window.fbq) return // já carregado
 
   ;(function (f, b, e, v, n) {
@@ -92,5 +98,6 @@ export function initMetaPixel(pixelId: string | undefined = import.meta.env.VITE
 /** Dispara evento Meta. Faz no-op se Pixel não foi inicializado. */
 export function trackPixel(event: "Lead" | "CompleteRegistration" | "Purchase" | "InitiateCheckout" | "ViewContent", params?: Record<string, unknown>) {
   if (typeof window === "undefined" || !window.fbq) return
+  if (!hasMarketingConsent()) return
   window.fbq("track", event, params ?? {})
 }
