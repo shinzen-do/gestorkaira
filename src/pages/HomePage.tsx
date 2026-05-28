@@ -124,7 +124,7 @@ export default function HomePage() {
             <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-gold transition-colors" />
           </div>
           <p className="text-sm font-medium text-foreground">Calendário</p>
-          <p className="text-xs text-muted-foreground mt-1">{overdue.length > 0 ? `${overdue.length} atrasada(s) — ` : ""}{upcoming.length} próxima(s)</p>
+          <p className="text-xs text-muted-foreground mt-1">{overdue.length > 0 ? `${overdue.length} ${overdue.length === 1 ? "atrasada" : "atrasadas"} — ` : ""}{upcoming.length} {upcoming.length === 1 ? "próxima" : "próximas"}</p>
         </Link>
       </div>
 

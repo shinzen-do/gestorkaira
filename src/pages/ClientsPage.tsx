@@ -83,7 +83,7 @@ function AdSetBlock({ adSet, campaign, client }: { adSet: AdSet; campaign: Campa
           <Layers className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           <span className="text-sm text-foreground truncate">{adSet.name}</span>
           <StatusBadge status={adSet.status} />
-          <span className="text-[11px] text-muted-foreground">R$ {Number(adSet.budget).toLocaleString()}</span>
+          <span className="text-[11px] text-muted-foreground">{Number(adSet.budget).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
         </button>
         <div className="flex items-center gap-0.5 shrink-0">
           <CreativeDialog adSetId={adSet.id} trigger={
@@ -176,7 +176,7 @@ function CampaignBlock({ campaign, client }: { campaign: Campaign; client: Clien
               {campaign.objective && <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{campaign.objective}</span>}
             </div>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              Orç. R$ {Number(campaign.budget).toLocaleString()} · Gasto R$ {Number(campaign.spend).toLocaleString()} · ROAS {Number(campaign.roas).toFixed(1)}x · {sets.length} conjunto{sets.length !== 1 && "s"}
+              Orç. {Number(campaign.budget).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} · Gasto {Number(campaign.spend).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} · ROAS {Number(campaign.roas).toFixed(1)}x · {sets.length} conjunto{sets.length !== 1 && "s"}
             </p>
           </div>
         </button>

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { History, ArrowUp, ArrowDown, Minus, Download, FileText, Filter } from "lucide-react";
 import { useAppData, type TimelineEntry, type TargetType } from "@/contexts/AppDataContext";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ListSkeleton } from "@/components/shared/PageSkeletons";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -335,8 +336,8 @@ export default function TimelinePage() {
         </p>
       </div>
 
-      {loading ? (
-        <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
+      {loading && enriched.length === 0 ? (
+        <ListSkeleton count={5} />
       ) : enriched.length === 0 ? (
         <EmptyState icon={History} title="Sem registros"
           description="Use o ícone de histórico em qualquer cliente, campanha ou conjunto para registrar mudanças." />

@@ -106,7 +106,22 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
                 </SelectContent>
               </Select>
             </div>
-            {linkType !== "none" && (
+            {linkType !== "none" && (() => {
+              const items =
+                linkType === "client" ? clients :
+                linkType === "campaign" ? campsLabeled :
+                linkType === "audience" ? audiences : [];
+              if (items.length === 0) {
+                const label = linkType === "client" ? "cliente" : linkType === "campaign" ? "campanha" : "público";
+                return (
+                  <div className="space-y-1.5"><Label>Selecione</Label>
+                    <div className="text-[11px] text-muted-foreground px-3 py-2.5 rounded-md border border-dashed border-border bg-secondary/30">
+                      Nenhum {label} cadastrado. Crie um primeiro pra poder vincular.
+                    </div>
+                  </div>
+                );
+              }
+              return (
               <div className="space-y-1.5"><Label>Selecione</Label>
                 <Select value={linkId} onValueChange={setLinkId}>
                   <SelectTrigger><SelectValue placeholder="Escolher…" /></SelectTrigger>
@@ -117,7 +132,8 @@ function NewNoteDialog({ defaultDate }: { defaultDate?: Date }) {
                   </SelectContent>
                 </Select>
               </div>
-            )}
+              );
+            })()}
           </div>
           <div className="space-y-1.5"><Label>Descrição</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} /></div>
         </div>

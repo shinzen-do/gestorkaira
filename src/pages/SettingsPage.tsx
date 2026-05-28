@@ -98,7 +98,11 @@ export default function SettingsPage() {
             <h2 className="text-sm font-semibold text-foreground">{t("settings.profile")}</h2>
           </div>
           <div className="space-y-1.5"><Label>Nome de exibição</Label><Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Seu nome" /></div>
-          <div className="space-y-1.5"><Label>E-mail</Label><Input value={user?.email ?? ""} disabled /></div>
+          <div className="space-y-1.5">
+            <Label>E-mail</Label>
+            <Input value={user?.email ?? ""} disabled />
+            <p className="text-[11px] text-muted-foreground">Trocar de email requer verificação. Pra mudar, fala com o suporte.</p>
+          </div>
           <Button onClick={saveProfile} disabled={saving}><Save className="w-4 h-4 mr-1.5" />{saving ? "Salvando..." : t("common.save")}</Button>
         </Card>
       </motion.div>

@@ -18,7 +18,7 @@ interface Props {
   campaign?: Campaign;
 }
 
-const objectives = ["Vendas", "Geração de Leads", "Conversão", "Tráfego", "Engajamento", "Reconhecimento", "Inscrições", "Mensagens"];
+const objectives = ["Vendas", "Geração de Leads", "Conversão", "Tráfego", "Engajamento", "Reconhecimento", "Inscrições", "Mensagens", "Afiliação", "Outro"];
 
 export function CampaignDialog({ trigger, clientId, campaign }: Props) {
   const { createCampaign, updateCampaign } = useAppData();
@@ -79,10 +79,21 @@ export function CampaignDialog({ trigger, clientId, campaign }: Props) {
         <div className="space-y-3 py-2">
           <div className="space-y-1.5"><Label>Nome *</Label><Input value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="Ex.: Black Friday — Conversão" /></div>
           <div className="space-y-1.5"><Label>Objetivo</Label>
-            <Select value={form.objective} onValueChange={(v) => set({ objective: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={objectives.includes(form.objective) ? form.objective : "Outro"}
+              onValueChange={(v) => set({ objective: v === "Outro" ? "" : v })}
+            >
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>{objectives.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
             </Select>
+            {!objectives.includes(form.objective) && (
+              <Input
+                value={form.objective}
+                onChange={(e) => set({ objective: e.target.value })}
+                placeholder="Descreva o objetivo"
+                className="mt-2"
+              />
+            )}
           </div>
 
           <div className="space-y-1.5">
