@@ -99,7 +99,7 @@ export default function AudiencesPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Públicos</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground">Públicos</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Gerencie públicos e ative-os em campanhas. Os mesmos públicos aparecem dentro de cada cliente.
           </p>

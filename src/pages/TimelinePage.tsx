@@ -241,7 +241,7 @@ export default function TimelinePage() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Histórico</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground">Histórico</h1>
           <p className="text-sm text-muted-foreground mt-1">Todas as mudanças registradas em clientes, campanhas, conjuntos e públicos.</p>
         </div>
         <DropdownMenu>

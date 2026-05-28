@@ -255,7 +255,7 @@ export default function CalendarPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Calendário</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground">Calendário</h1>
           <p className="text-sm text-muted-foreground mt-1">Anote prazos e visualize mudanças registradas a cada dia.</p>
         </div>
         <NewNoteDialog defaultDate={selectedDate} />

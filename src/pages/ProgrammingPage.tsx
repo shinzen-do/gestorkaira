@@ -38,7 +38,7 @@ export default function ProgrammingPage() {
           <div className="flex items-center gap-2 text-xs text-cobalt uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" /> Programação
           </div>
-          <h1 className="font-display text-3xl text-foreground mt-1">Programação do mês</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground mt-1">Programação do mês</h1>
           <p className="text-sm text-muted-foreground mt-1">Planeje campanhas futuras por cliente e veja o total comparado ao orçamento mensal.</p>
         </div>
         <PlannedCampaignDialog trigger={<Button><Plus className="w-4 h-4 mr-1.5" /> Nova programação</Button>} />

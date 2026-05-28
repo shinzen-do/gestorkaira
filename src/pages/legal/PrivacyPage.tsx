@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       </nav>
 
       <main className="max-w-3xl mx-auto px-6 py-12 prose prose-invert">
-        <h1 className="font-display text-3xl mb-2">Política de Privacidade</h1>
+        <h1 className="font-display text-2xl sm:text-3xl mb-2">Política de Privacidade</h1>
         <p className="text-xs text-muted-foreground mb-8">Última atualização: 27 de maio de 2026</p>
 
         <Section title="1. Quem somos">

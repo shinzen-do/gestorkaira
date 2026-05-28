@@ -80,7 +80,7 @@ export default function TasksPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 p-2">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-3xl text-foreground">Tarefas</h1>
+        <h1 className="font-display text-2xl sm:text-3xl text-foreground">Tarefas</h1>
         <p className="text-sm text-muted-foreground mt-1">Tudo que precisa da sua atenção: campanhas a ativar/desativar, lembretes e tarefas geradas por IA.</p>
       </motion.div>
 
@@ -90,7 +90,7 @@ export default function TasksPage() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={4}
-          placeholder={`Ex.: Conversei com o cliente Acme. Quer pausar a campanha de Black Friday segunda-feira e subir 3 criativos novos até quarta. Orçamento sobe pra R$ 200/dia em dezembro.`}
+          placeholder="Cole briefing, mensagem do cliente ou anotação livre. A IA extrai tarefas com prazo e prioridade."
         />
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <p className="text-[11px] text-muted-foreground max-w-md">

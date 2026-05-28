@@ -74,7 +74,7 @@ const NotFound = () => {
         <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3 flex items-center justify-center gap-2">
           <Compass className="w-3.5 h-3.5" /> Página fora do mapa
         </p>
-        <h2 className="font-display text-3xl text-foreground mb-3 tracking-tight">
+        <h2 className="font-display text-2xl sm:text-3xl text-foreground mb-3 tracking-tight">
           Esse caminho não existe
         </h2>
         <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed mb-2">

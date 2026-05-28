@@ -315,15 +315,15 @@ function ClientCard({ client, defaultOpen }: { client: Client; defaultOpen: bool
         </button>
         <div className="flex items-center gap-0.5 shrink-0">
           <ChangeDialog targetType="client" targetId={client.id} targetName={client.name} trigger={
-            <button title="Registrar mudança" className="p-2 rounded hover:bg-secondary text-muted-foreground"><History className="w-4 h-4" /></button>
+            <button title="Registrar mudança" className="hidden sm:inline-flex p-2 rounded hover:bg-secondary text-muted-foreground"><History className="w-4 h-4" /></button>
           } />
           <ClientDialog client={client} trigger={
-            <button title="Editar cliente" className="p-2 rounded hover:bg-secondary text-muted-foreground"><Pencil className="w-4 h-4" /></button>
+            <button title="Editar cliente" className="p-1.5 sm:p-2 rounded hover:bg-secondary text-muted-foreground"><Pencil className="w-4 h-4" /></button>
           } />
           <ConfirmDialog title={`Excluir ${client.name}?`} description="Todas as campanhas, conjuntos, criativos e públicos vinculados serão removidos."
             confirmLabel="Excluir" destructive
             onConfirm={() => deleteClient(client.id).then(() => toast.success("Cliente excluído"))}
-            trigger={<button title="Excluir" className="p-2 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>}
+            trigger={<button title="Excluir" className="p-1.5 sm:p-2 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>}
           />
         </div>
       </div>
@@ -454,7 +454,7 @@ export default function ClientsPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Clientes</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground">Clientes</h1>
           <p className="text-sm text-muted-foreground mt-1">Cada cliente tem seu dashboard, campanhas, públicos vinculados e criativos validados.</p>
         </div>
         <ClientDialog trigger={<Button><Plus className="w-4 h-4 mr-1.5" /> Novo cliente</Button>} />

@@ -43,7 +43,7 @@ function DefaultFallback({ error, reset }: { error: Error; reset: () => void }) 
             <AlertTriangle className="w-6 h-6 text-destructive" strokeWidth={1.5} />
           </div>
           <p className="text-xs uppercase tracking-[0.3em] text-destructive mb-2">Erro inesperado</p>
-          <h1 className="font-display text-3xl text-foreground mb-3 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl text-foreground mb-3 tracking-tight">
             Algo travou aqui
           </h1>
           <p className="text-sm text-muted-foreground mb-2 leading-relaxed">

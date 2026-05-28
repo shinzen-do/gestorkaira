@@ -229,12 +229,12 @@ export default function PacingPage() {
   }, [today]);
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
         <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
           <Activity className="w-3.5 h-3.5" /> Pacing
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">Controle de orçamento mensal</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Controle de orçamento mensal</h1>
         <p className="text-muted-foreground text-sm">
           Defina o orçamento de cada cliente, registre o gasto do dia e veja em tempo real se o ritmo está saudável.
         </p>
@@ -242,8 +242,8 @@ export default function PacingPage() {
 
       {/* Filtros mês/ano */}
       <Card className="glass-card">
-        <CardContent className="pt-6 flex flex-wrap items-end gap-4">
-          <div className="space-y-2 min-w-[160px]">
+        <CardContent className="pt-6 flex flex-wrap items-end gap-3 sm:gap-4">
+          <div className="space-y-2 flex-1 min-w-[120px]">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">Mês</Label>
             <Select value={String(month)} onValueChange={(v) => setMonth(parseInt(v))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -254,7 +254,7 @@ export default function PacingPage() {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2 min-w-[120px]">
+          <div className="space-y-2 flex-1 min-w-[100px]">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">Ano</Label>
             <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -265,7 +265,7 @@ export default function PacingPage() {
               </SelectContent>
             </Select>
           </div>
-          <div className="text-xs text-muted-foreground ml-auto">
+          <div className="text-xs text-muted-foreground w-full sm:w-auto sm:ml-auto sm:self-end pb-2">
             <CalendarIcon className="w-3.5 h-3.5 inline mr-1" />
             Mês com {totalDays} dias
           </div>

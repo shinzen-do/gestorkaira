@@ -73,7 +73,7 @@ export default function FollowersPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 p-2">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-3xl text-foreground">Seguidores</h1>
+        <h1 className="font-display text-2xl sm:text-3xl text-foreground">Seguidores</h1>
         <p className="text-sm text-muted-foreground mt-1">Registre quantos seguidores cada cliente tem em cada rede e acompanhe a evolução.</p>
       </motion.div>
 

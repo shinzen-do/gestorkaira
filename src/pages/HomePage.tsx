@@ -46,7 +46,7 @@ export default function HomePage() {
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-xs uppercase tracking-[0.2em] text-gold mb-2">Kaira</p>
-        <h1 className="font-display text-4xl text-foreground tracking-tight">Bem-vindo{greeting}</h1>
+        <h1 className="font-display text-3xl sm:text-4xl text-foreground tracking-tight">Bem-vindo{greeting}</h1>
         <p className="text-sm text-muted-foreground mt-2">Tráfego pago · Resultados reais</p>
       </motion.div>
 

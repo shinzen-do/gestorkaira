@@ -201,7 +201,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight">Entrar</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Entrar</h1>
             <p className="text-muted-foreground text-sm mt-2">
               Acesse sua central de comando.
             </p>
