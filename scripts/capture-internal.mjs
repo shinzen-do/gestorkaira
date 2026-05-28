@@ -13,10 +13,11 @@ const OUT_DIR = resolve(__dirname, "../public/screenshots");
 const BASE = process.env.BASE_URL ?? "https://gestorkaira.vercel.app";
 const EMAIL = process.env.KAIRA_TEST_EMAIL;
 const PASSWORD = process.env.KAIRA_TEST_PASSWORD;
+const MAGIC_LINK = process.env.KAIRA_MAGIC_LINK;
 const EXECUTABLE = process.env.CHROME_PATH ?? "/usr/bin/google-chrome";
 
-if (!EMAIL || !PASSWORD) {
-  console.error("Missing KAIRA_TEST_EMAIL or KAIRA_TEST_PASSWORD env vars.");
+if (!MAGIC_LINK && (!EMAIL || !PASSWORD)) {
+  console.error("Missing KAIRA_MAGIC_LINK or (KAIRA_TEST_EMAIL + KAIRA_TEST_PASSWORD).");
   process.exit(1);
 }
 
@@ -47,20 +48,26 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
 
-  console.log(`→ Login ${EMAIL} em ${BASE}`);
-  await page.goto(`${BASE}/login`, { waitUntil: "networkidle2" });
+  if (MAGIC_LINK) {
+    console.log(`→ Auth via magic link`);
+    await page.goto(MAGIC_LINK, { waitUntil: "networkidle2" });
+    // Wait for supabase JS to consume hash tokens and persist session
+    await new Promise((r) => setTimeout(r, 2500));
+    await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle2" });
+  } else {
+    console.log(`→ Login ${EMAIL} em ${BASE}`);
+    await page.goto(`${BASE}/login`, { waitUntil: "networkidle2" });
+    await page.waitForSelector("#email");
+    await page.type("#email", EMAIL, { delay: 12 });
+    await page.type("#password", PASSWORD, { delay: 12 });
+    await page.click("button[type=submit]");
+  }
 
-  await page.waitForSelector("#email");
-  await page.type("#email", EMAIL, { delay: 12 });
-  await page.type("#password", PASSWORD, { delay: 12 });
-
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
-    page.click("button[type=submit]"),
-  ]);
-
-  if (!page.url().includes("/dashboard")) {
-    console.error(`Login falhou. URL atual: ${page.url()}`);
+  try {
+    await page.waitForFunction(() => location.pathname.startsWith("/dashboard"), { timeout: 60000 });
+  } catch {
+    console.error(`Auth falhou ou timeout. URL atual: ${page.url()}`);
+    await page.screenshot({ path: `${OUT_DIR}/_login-error.png` });
     process.exit(2);
   }
   console.log("✓ Logado");
