@@ -44,7 +44,7 @@ const N_MAP: Record<string, "client" | "audience" | "calendar"> = {
   t: "calendar",
 };
 
-const CHORD_TIMEOUT_MS = 2000;
+const CHORD_TIMEOUT_MS = 2500;
 
 function isTypingTarget(t: EventTarget | null) {
   if (!(t instanceof HTMLElement)) return false;
@@ -59,25 +59,42 @@ interface Options {
   onCreate?: (which: "client" | "audience" | "calendar") => void;
 }
 
-export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
+export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options): Chord {
   const navigate = useNavigate();
-  const chordRef = useRef<Chord>(null);
-  const chordTimerRef = useRef<number | null>(null);
-  const downKeysRef = useRef<Set<string>>(new Set());
+  const [chordDisplay, setChordDisplay] = useState<Chord>(null);
+
+  const onOpenHelpRef = useRef(onOpenHelp);
+  const onCreateRef = useRef(onCreate);
+  const navigateRef = useRef(navigate);
+  onOpenHelpRef.current = onOpenHelp;
+  onCreateRef.current = onCreate;
+  navigateRef.current = navigate;
 
   useEffect(() => {
-    const clearChord = () => {
-      chordRef.current = null;
-      if (chordTimerRef.current) {
-        window.clearTimeout(chordTimerRef.current);
-        chordTimerRef.current = null;
+    const chordRef = { current: null as Chord };
+    const downKeys = new Set<string>();
+    let chordTimer: number | null = null;
+    let displayTimer: number | null = null;
+
+    const setChord = (c: Chord) => {
+      chordRef.current = c;
+      if (chordTimer) window.clearTimeout(chordTimer);
+      if (displayTimer) window.clearTimeout(displayTimer);
+      if (c) {
+        chordTimer = window.setTimeout(() => {
+          chordRef.current = null;
+          setChordDisplay(null);
+        }, CHORD_TIMEOUT_MS);
+        setChordDisplay(c);
+      } else {
+        setChordDisplay(null);
       }
     };
 
-    const armChord = (c: Chord) => {
-      chordRef.current = c;
-      if (chordTimerRef.current) window.clearTimeout(chordTimerRef.current);
-      chordTimerRef.current = window.setTimeout(clearChord, CHORD_TIMEOUT_MS);
+    const clearChord = () => {
+      chordRef.current = null;
+      if (chordTimer) { window.clearTimeout(chordTimer); chordTimer = null; }
+      setChordDisplay(null);
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -85,49 +102,48 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
       if (isTypingTarget(e.target)) return;
 
       const key = e.key.toLowerCase();
-      downKeysRef.current.add(key);
 
-      if (e.repeat) return;
-
-      if (key === "?" || (e.shiftKey && key === "/")) {
-        e.preventDefault();
-        onOpenHelp();
+      if (e.repeat) {
+        downKeys.add(key);
         return;
       }
 
-      const gHeld = chordRef.current === "g" || downKeysRef.current.has("g");
-      const nHeld = chordRef.current === "n" || downKeysRef.current.has("n");
+      downKeys.add(key);
+
+      if (key === "?" || (e.shiftKey && key === "/")) {
+        e.preventDefault();
+        onOpenHelpRef.current();
+        return;
+      }
+
+      const gHeld = chordRef.current === "g" || downKeys.has("g");
+      const nHeld = chordRef.current === "n" || downKeys.has("n");
 
       if (gHeld && key !== "g" && G_MAP[key]) {
         e.preventDefault();
-        navigate(G_MAP[key]);
+        navigateRef.current(G_MAP[key]);
         clearChord();
         return;
       }
 
       if (nHeld && key !== "n" && N_MAP[key]) {
         e.preventDefault();
-        onCreate?.(N_MAP[key]);
+        onCreateRef.current?.(N_MAP[key]);
         clearChord();
         return;
       }
 
-      if (key === "g") {
-        armChord("g");
-        return;
-      }
-      if (key === "n") {
-        armChord("n");
-        return;
-      }
+      if (key === "g") { setChord("g"); return; }
+      if (key === "n") { setChord("n"); return; }
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
-      downKeysRef.current.delete(e.key.toLowerCase());
+      downKeys.delete(e.key.toLowerCase());
     };
 
     const onBlur = () => {
-      downKeysRef.current.clear();
+      downKeys.clear();
+      clearChord();
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -137,36 +153,10 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("blur", onBlur);
-      if (chordTimerRef.current) window.clearTimeout(chordTimerRef.current);
+      if (chordTimer) window.clearTimeout(chordTimer);
+      if (displayTimer) window.clearTimeout(displayTimer);
     };
-  }, [navigate, onOpenHelp, onCreate]);
-}
+  }, []);
 
-export function useChordIndicator() {
-  const [chord, setChord] = useState<Chord>(null);
-
-  useEffect(() => {
-    let timer: number | null = null;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (isTypingTarget(e.target)) return;
-      const key = e.key.toLowerCase();
-      if (key === "g" || key === "n") {
-        if (e.repeat) return;
-        setChord(key as Chord);
-        if (timer) window.clearTimeout(timer);
-        timer = window.setTimeout(() => setChord(null), CHORD_TIMEOUT_MS);
-      } else if (chord) {
-        setChord(null);
-        if (timer) window.clearTimeout(timer);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      if (timer) window.clearTimeout(timer);
-    };
-  }, [chord]);
-
-  return chord;
+  return chordDisplay;
 }

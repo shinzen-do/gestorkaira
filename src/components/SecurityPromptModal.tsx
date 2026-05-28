@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShieldCheck, Smartphone, KeyRound, ArrowRight } from "lucide-react";
+import { ShieldCheck, KeyRound, ArrowRight, Mail } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const STORAGE_KEY = "kaira_security_prompted";
@@ -16,38 +15,24 @@ export function SecurityPromptModal() {
 
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-
-    const check = async () => {
-      try {
-        const prompted = localStorage.getItem(STORAGE_KEY);
-        if (prompted) return;
-      } catch {
-        return;
-      }
-
-      const { data, error } = await supabase.auth.mfa.listFactors();
-      if (cancelled || error) return;
-      const verified = [...(data.totp ?? []), ...(data.phone ?? [])].filter(
-        (f) => f.status === "verified",
-      );
-      if (verified.length === 0) {
-        window.setTimeout(() => !cancelled && setOpen(true), 1500);
-      } else {
-        try {
-          localStorage.setItem(STORAGE_KEY, "already-set");
-        } catch {}
-      }
-    };
-
-    check();
-    return () => { cancelled = true; };
+    try {
+      const prompted = localStorage.getItem(STORAGE_KEY);
+      if (prompted) return;
+    } catch {
+      return;
+    }
+    const identities = (user as { identities?: Array<{ provider?: string }> }).identities ?? [];
+    const hasEmailPassword = identities.some((i) => i.provider === "email");
+    if (hasEmailPassword) {
+      try { localStorage.setItem(STORAGE_KEY, "already-set"); } catch {}
+      return;
+    }
+    const t = window.setTimeout(() => setOpen(true), 1500);
+    return () => window.clearTimeout(t);
   }, [user]);
 
-  const dismiss = (markDone: boolean) => {
-    if (markDone) {
-      try { localStorage.setItem(STORAGE_KEY, "dismissed"); } catch {}
-    }
+  const dismiss = () => {
+    try { localStorage.setItem(STORAGE_KEY, "dismissed"); } catch {}
     setOpen(false);
   };
 
@@ -56,11 +41,12 @@ export function SecurityPromptModal() {
     navigate("/settings");
     window.setTimeout(() => {
       document.getElementById("security")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
+      document.getElementById("new-password")?.focus();
+    }, 250);
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && dismiss(true)}>
+    <Dialog open={open} onOpenChange={(o) => !o && dismiss()}>
       <DialogContent className="max-w-md p-0 overflow-hidden border-glass-border">
         <div className="relative p-8 text-center">
           <div
@@ -86,10 +72,10 @@ export function SecurityPromptModal() {
 
           <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">Boas-vindas ao Kaira</p>
           <h2 className="font-display text-3xl text-foreground tracking-tight mb-3">
-            Proteja sua conta
+            Defina uma senha
           </h2>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed mb-6">
-            Gestores de tráfego mexem com dados de cliente e contas com gasto real. Ative 2FA agora — leva 30 segundos.
+            Você entrou pelo Google. Defina uma senha pra também poder entrar com email — útil se um dia perder acesso à conta Google.
           </p>
 
           <div className="space-y-2 mb-6">
@@ -98,27 +84,27 @@ export function SecurityPromptModal() {
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-glass-border bg-surface-1/60 hover:border-gold-soft transition-colors text-left group"
             >
               <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center shrink-0">
-                <Smartphone className="w-5 h-5 text-gold" />
+                <KeyRound className="w-5 h-5 text-gold" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Aplicativo autenticador (TOTP)</p>
-                <p className="text-[11px] text-muted-foreground">Google Authenticator, Authy, 1Password</p>
+                <p className="text-sm font-medium text-foreground">Criar senha agora</p>
+                <p className="text-[11px] text-muted-foreground">30 segundos · vai te levar pras configurações</p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-gold transition-colors shrink-0" />
             </button>
 
-            <div className="flex items-center gap-4 p-4 rounded-xl border border-dashed border-border bg-secondary/20 text-left opacity-60 cursor-not-allowed">
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-dashed border-border bg-secondary/20 text-left">
               <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                <KeyRound className="w-5 h-5 text-muted-foreground" />
+                <Mail className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Passkey (em breve)</p>
-                <p className="text-[11px] text-muted-foreground">Biometria do celular ou chave de segurança</p>
+                <p className="text-sm font-medium text-foreground">Continuar só com Google</p>
+                <p className="text-[11px] text-muted-foreground">Você pode definir senha depois em Configurações</p>
               </div>
             </div>
           </div>
 
-          <Button variant="ghost" onClick={() => dismiss(true)} className="text-xs text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" onClick={dismiss} className="text-xs text-muted-foreground hover:text-foreground">
             Pular por enquanto
           </Button>
         </div>

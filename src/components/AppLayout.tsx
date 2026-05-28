@@ -8,14 +8,13 @@ import { ShortcutsModal } from "./ShortcutsModal";
 import { SecurityPromptModal } from "./SecurityPromptModal";
 import { ClientDialog } from "./dialogs/ClientDialog";
 import { AudienceDialog } from "./dialogs/AudienceDialog";
-import { useKeyboardShortcuts, useChordIndicator } from "@/hooks/useKeyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [helpOpen, setHelpOpen] = useState(false);
   const [newClientOpen, setNewClientOpen] = useState(false);
   const [newAudienceOpen, setNewAudienceOpen] = useState(false);
   const navigate = useNavigate();
-  const chord = useChordIndicator();
 
   const handleCreate = useCallback(
     (which: "client" | "audience" | "calendar") => {
@@ -26,8 +25,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     [navigate],
   );
 
-  useKeyboardShortcuts({
-    onOpenHelp: () => setHelpOpen(true),
+  const handleOpenHelp = useCallback(() => setHelpOpen(true), []);
+
+  const chord = useKeyboardShortcuts({
+    onOpenHelp: handleOpenHelp,
     onCreate: handleCreate,
   });
 
