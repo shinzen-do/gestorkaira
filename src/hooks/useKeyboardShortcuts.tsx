@@ -26,6 +26,26 @@ export const SHORTCUTS: ShortcutBinding[] = [
   { combo: "?", label: "Mostrar atalhos", group: "Geral" },
 ];
 
+const G_MAP: Record<string, string> = {
+  d: "/dashboard",
+  c: "/clients",
+  a: "/audiences",
+  k: "/calendar",
+  t: "/timeline",
+  p: "/pacing",
+  r: "/programacao",
+  f: "/followers",
+  s: "/settings",
+};
+
+const N_MAP: Record<string, "client" | "audience" | "calendar"> = {
+  c: "client",
+  p: "audience",
+  t: "calendar",
+};
+
+const CHORD_TIMEOUT_MS = 2000;
+
 function isTypingTarget(t: EventTarget | null) {
   if (!(t instanceof HTMLElement)) return false;
   const tag = t.tagName;
@@ -43,6 +63,7 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
   const navigate = useNavigate();
   const chordRef = useRef<Chord>(null);
   const chordTimerRef = useRef<number | null>(null);
+  const downKeysRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const clearChord = () => {
@@ -56,14 +77,17 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
     const armChord = (c: Chord) => {
       chordRef.current = c;
       if (chordTimerRef.current) window.clearTimeout(chordTimerRef.current);
-      chordTimerRef.current = window.setTimeout(clearChord, 1200);
+      chordTimerRef.current = window.setTimeout(clearChord, CHORD_TIMEOUT_MS);
     };
 
-    const onKey = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (isTypingTarget(e.target)) return;
 
       const key = e.key.toLowerCase();
+      downKeysRef.current.add(key);
+
+      if (e.repeat) return;
 
       if (key === "?" || (e.shiftKey && key === "/")) {
         e.preventDefault();
@@ -71,29 +95,19 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
         return;
       }
 
-      if (chordRef.current === "g") {
+      const gHeld = chordRef.current === "g" || downKeysRef.current.has("g");
+      const nHeld = chordRef.current === "n" || downKeysRef.current.has("n");
+
+      if (gHeld && key !== "g" && G_MAP[key]) {
         e.preventDefault();
-        const map: Record<string, string> = {
-          d: "/dashboard",
-          c: "/clients",
-          a: "/audiences",
-          k: "/calendar",
-          t: "/timeline",
-          p: "/pacing",
-          r: "/programacao",
-          f: "/followers",
-          s: "/settings",
-        };
-        if (map[key]) navigate(map[key]);
+        navigate(G_MAP[key]);
         clearChord();
         return;
       }
 
-      if (chordRef.current === "n") {
+      if (nHeld && key !== "n" && N_MAP[key]) {
         e.preventDefault();
-        if (key === "c") onCreate?.("client");
-        if (key === "p") onCreate?.("audience");
-        if (key === "t") onCreate?.("calendar");
+        onCreate?.(N_MAP[key]);
         clearChord();
         return;
       }
@@ -108,9 +122,21 @@ export function useKeyboardShortcuts({ onOpenHelp, onCreate }: Options) {
       }
     };
 
-    window.addEventListener("keydown", onKey);
+    const onKeyUp = (e: KeyboardEvent) => {
+      downKeysRef.current.delete(e.key.toLowerCase());
+    };
+
+    const onBlur = () => {
+      downKeysRef.current.clear();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
     return () => {
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
       if (chordTimerRef.current) window.clearTimeout(chordTimerRef.current);
     };
   }, [navigate, onOpenHelp, onCreate]);
@@ -126,9 +152,10 @@ export function useChordIndicator() {
       if (isTypingTarget(e.target)) return;
       const key = e.key.toLowerCase();
       if (key === "g" || key === "n") {
+        if (e.repeat) return;
         setChord(key as Chord);
         if (timer) window.clearTimeout(timer);
-        timer = window.setTimeout(() => setChord(null), 1200);
+        timer = window.setTimeout(() => setChord(null), CHORD_TIMEOUT_MS);
       } else if (chord) {
         setChord(null);
         if (timer) window.clearTimeout(timer);
