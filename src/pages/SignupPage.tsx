@@ -67,6 +67,11 @@ export default function SignupPage() {
     // Tracking de conversão
     trackPixel("CompleteRegistration", { plan: selectedPlan ?? "free" });
 
+    // Welcome email — fire-and-forget (não bloqueia signup se falhar)
+    supabase.functions.invoke("send-welcome", {
+      body: { to: email, name: fullName, plan: selectedPlan ?? "free" },
+    }).catch((err) => console.warn("send-welcome failed:", err));
+
     // Auto-login após signup (auto-confirm está ativo)
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {

@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 
 // Lazy: páginas que rodam fora do AppLayout
 const AuthorizePage = lazy(() => import("./pages/AuthorizePage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 // Lazy: páginas legais (acessadas raramente)
 const PrivacyPage = lazy(() => import("./pages/legal/PrivacyPage"));
@@ -74,6 +75,7 @@ const App = () => (
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/authorize" element={<Suspense fallback={<RouteFallback />}><AuthorizePage /></Suspense>} />
+                  <Route path="/admin" element={<Suspense fallback={<RouteFallback />}><AdminPage /></Suspense>} />
                   <Route path="/privacidade" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
                   <Route path="/termos" element={<Suspense fallback={null}><TermsPage /></Suspense>} />
                   <Route path="/reembolso" element={<Suspense fallback={null}><RefundPage /></Suspense>} />

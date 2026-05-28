@@ -10,7 +10,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FROM = "Kaira <boas-vindas@kaira.app>";
+// FROM pode ser sobrescrito via env. Antes do domínio próprio estar verificado
+// no Resend, usar o sender default deles: onboarding@resend.dev
+const FROM = Deno.env.get("RESEND_FROM") ?? "Kaira <onboarding@resend.dev>";
+const APP_URL = Deno.env.get("PUBLIC_APP_URL") ?? "https://gestorkaira.vercel.app";
+const SUPPORT_EMAIL = Deno.env.get("SUPPORT_EMAIL") ?? "essenciamarketingegestao@gmail.com";
 const SUBJECT = "Bem-vindo ao Kaira";
 
 function html({ name, plan }: { name: string; plan: string }) {
@@ -37,7 +41,7 @@ function html({ name, plan }: { name: string; plan: string }) {
           <p style="font-size:18px;font-weight:600;color:#f5f5f7;margin:0">${planLabel[plan] ?? plan}</p>
           <p style="font-size:12px;color:#a1a1aa;margin:8px 0 0">Seu acesso já está liberado. Em breve enviamos o link do checkout para garantir o plano.</p>
         </div>` : ""}
-        <a href="https://kaira.app/dashboard" style="display:inline-block;background:#3b6cff;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;font-size:14px;margin:8px 0 24px">Entrar no Kaira →</a>
+        <a href="${APP_URL}/dashboard" style="display:inline-block;background:#3b6cff;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;font-size:14px;margin:8px 0 24px">Entrar no Kaira →</a>
         <p style="font-size:13px;line-height:1.6;color:#a1a1aa;margin:0 0 8px"><strong style="color:#f5f5f7">3 primeiros passos:</strong></p>
         <ol style="font-size:13px;line-height:1.7;color:#a1a1aa;margin:0;padding-left:20px">
           <li>Cadastre seu primeiro cliente em <em>Clientes</em>.</li>
@@ -45,7 +49,7 @@ function html({ name, plan }: { name: string; plan: string }) {
           <li>Use o atalho <strong>⌘K</strong> (Ctrl+K) pra buscar qualquer coisa em segundos.</li>
         </ol>
         <p style="font-size:12px;line-height:1.6;color:#52525b;margin:40px 0 0;border-top:1px solid #1c1f29;padding-top:16px">
-          Dúvidas? Responde este e-mail ou escreve em <a href="mailto:contato@kaira.app" style="color:#3b6cff;text-decoration:none">contato@kaira.app</a>.
+          Dúvidas? Responde este e-mail ou escreve em <a href="mailto:${SUPPORT_EMAIL}" style="color:#3b6cff;text-decoration:none">${SUPPORT_EMAIL}</a>.
         </p>
       </td></tr>
     </table>
