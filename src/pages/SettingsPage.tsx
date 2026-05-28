@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { SecuritySection } from "@/components/settings/SecuritySection";
 
 export default function SettingsPage() {
   useDocumentTitle("Configurações");
@@ -106,6 +107,8 @@ export default function SettingsPage() {
           <Button onClick={saveProfile} disabled={saving}><Save className="w-4 h-4 mr-1.5" />{saving ? "Salvando..." : t("common.save")}</Button>
         </Card>
       </motion.div>
+
+      <SecuritySection />
 
       {/* Aparência */}
       <Card className="p-5 space-y-4">

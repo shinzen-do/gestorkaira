@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { KairaSidebar } from "./KairaSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { ShortcutsModal } from "./ShortcutsModal";
+import { SecurityPromptModal } from "./SecurityPromptModal";
 import { ClientDialog } from "./dialogs/ClientDialog";
 import { AudienceDialog } from "./dialogs/AudienceDialog";
 import { useKeyboardShortcuts, useChordIndicator } from "@/hooks/useKeyboardShortcuts";
@@ -30,6 +31,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     onCreate: handleCreate,
   });
 
+  useEffect(() => {
+    const prefetch = () => {
+      import("@/pages/HomePage");
+      import("@/pages/ClientsPage");
+      import("@/pages/AudiencesPage");
+      import("@/pages/CalendarPage");
+      import("@/pages/TimelinePage");
+      import("@/pages/PacingPage");
+      import("@/pages/ProgrammingPage");
+      import("@/pages/TasksPage");
+      import("@/pages/FollowersPage");
+      import("@/pages/SettingsPage");
+    };
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    if (idle) idle(prefetch);
+    else window.setTimeout(prefetch, 800);
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -46,6 +65,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       <ShortcutsModal open={helpOpen} onOpenChange={setHelpOpen} />
+      <SecurityPromptModal />
       <ClientDialog open={newClientOpen} onOpenChange={setNewClientOpen} />
       <AudienceDialog open={newAudienceOpen} onOpenChange={setNewAudienceOpen} />
 
