@@ -20,7 +20,11 @@ interface ApiKeyRow {
   revoked_at: string | null;
 }
 
-const MCP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kaira-mcp`;
+// URL pública via Vercel rewrite — necessário pra OAuth discovery (well-known
+// no host root). Em localhost cai pra Supabase direto (sem OAuth, só Bearer api_key).
+const MCP_URL = typeof window !== "undefined" && window.location.host.includes("localhost")
+  ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kaira-mcp`
+  : `${window.location.origin}/mcp`;
 
 function randomKey(): string {
   const bytes = new Uint8Array(32);

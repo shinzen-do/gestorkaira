@@ -43,10 +43,13 @@ export function GoogleSignInButton({ label = "Continuar com Google", className }
 
   const handleClick = async () => {
     setLoading(true);
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next");
+    const target = next && next.startsWith("/") ? next : "/dashboard";
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}${target}`,
       },
     });
     if (error) {

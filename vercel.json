@@ -4,6 +4,34 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    {
+      "source": "/.well-known/oauth-protected-resource",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/.well-known/oauth-protected-resource"
+    },
+    {
+      "source": "/.well-known/oauth-authorization-server",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/.well-known/oauth-authorization-server"
+    },
+    {
+      "source": "/mcp/.well-known/:path*",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/.well-known/:path*"
+    },
+    {
+      "source": "/mcp/register",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/register"
+    },
+    {
+      "source": "/mcp/token",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/token"
+    },
+    {
+      "source": "/mcp/messages",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp/messages"
+    },
+    {
+      "source": "/mcp",
+      "destination": "https://vyfcfvozwizobnjsxnmq.supabase.co/functions/v1/kaira-mcp"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

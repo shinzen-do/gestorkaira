@@ -517,6 +517,102 @@ export type Database = {
         }
         Relationships: []
       }
+      oauth_clients: {
+        Row: {
+          client_id: string
+          client_name: string | null
+          created_at: string
+          redirect_uris: string[]
+        }
+        Insert: {
+          client_id: string
+          client_name?: string | null
+          created_at?: string
+          redirect_uris: string[]
+        }
+        Update: {
+          client_id?: string
+          client_name?: string | null
+          created_at?: string
+          redirect_uris?: string[]
+        }
+        Relationships: []
+      }
+      oauth_codes: {
+        Row: {
+          client_id: string
+          code: string
+          code_challenge: string
+          code_challenge_method: string
+          created_at: string
+          expires_at: string
+          redirect_uri: string
+          scope: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          code: string
+          code_challenge: string
+          code_challenge_method?: string
+          created_at?: string
+          expires_at?: string
+          redirect_uri: string
+          scope?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          code?: string
+          code_challenge?: string
+          code_challenge_method?: string
+          created_at?: string
+          expires_at?: string
+          redirect_uri?: string
+          scope?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      oauth_tokens: {
+        Row: {
+          client_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          last_used_at: string | null
+          revoked_at: string | null
+          scope: string | null
+          token_hash: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          scope?: string | null
+          token_hash: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          scope?: string | null
+          token_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       planned_campaigns: {
         Row: {
           budget_type: string
@@ -719,7 +815,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_oauth_code: {
+        Args: {
+          p_client_id: string
+          p_code_challenge: string
+          p_code_challenge_method?: string
+          p_redirect_uri: string
+          p_scope?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

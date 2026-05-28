@@ -87,7 +87,9 @@ export default function LoginPage() {
     }
 
     toast({ title: "Acesso concedido", description: "Bem-vindo de volta ao Kaira." });
-    navigate("/dashboard", { replace: true });
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next");
+    navigate(next && next.startsWith("/") ? next : "/dashboard", { replace: true });
   };
 
   const handleForgotPassword = async () => {
