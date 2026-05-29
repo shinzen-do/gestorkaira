@@ -213,7 +213,299 @@ const TOOLS = [
     description: "Popula conta com dados realistas (5 clientes, 12 campanhas, públicos, notas). Idempotente: skipa se já tem ≥3 clientes.",
     inputSchema: { type: "object", properties: {} },
   },
+
+  // ---- Leitura ----
+  {
+    name: "kaira_account_summary",
+    description: "Resumo da conta: totais (clientes, campanhas, gasto) + por cliente (gasto total, ROAS médio, orçamento, nº campanhas). Use pra visão geral antes de analisar.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "kaira_list_campaigns",
+    description: "Lista campanhas. Filtra por client_id e/ou status (active|paused|archived).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        client_id: { type: "string" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        limit: { type: "number" },
+      },
+    },
+  },
+  {
+    name: "kaira_list_ad_sets",
+    description: "Lista ad sets (conjuntos de anúncios). Filtra por campaign_id.",
+    inputSchema: { type: "object", properties: { campaign_id: { type: "string" }, limit: { type: "number" } } },
+  },
+  {
+    name: "kaira_list_creatives",
+    description: "Lista criativos (anúncios). Filtra por ad_set_id. Inclui métricas (ctr, impressões, resultados, custo por resultado).",
+    inputSchema: { type: "object", properties: { ad_set_id: { type: "string" }, limit: { type: "number" } } },
+  },
+  {
+    name: "kaira_list_audiences",
+    description: "Lista públicos do usuário.",
+    inputSchema: { type: "object", properties: { limit: { type: "number" } } },
+  },
+  {
+    name: "kaira_list_calendar_notes",
+    description: "Lista notas do calendário. Filtra por intervalo de datas (from/to no formato YYYY-MM-DD) e/ou só pendentes.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        from: { type: "string" },
+        to: { type: "string" },
+        only_pending: { type: "boolean" },
+        limit: { type: "number" },
+      },
+    },
+  },
+  {
+    name: "kaira_list_tasks",
+    description: "Lista tarefas (ai_tasks). only_pending=true mostra só as não concluídas.",
+    inputSchema: { type: "object", properties: { only_pending: { type: "boolean" }, limit: { type: "number" } } },
+  },
+  {
+    name: "kaira_list_timeline",
+    description: "Lista o histórico/auditoria de mudanças. Filtra por target_type (client|campaign|adset|audience|creative) e target_id.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        target_type: { type: "string", enum: ["client", "campaign", "adset", "audience", "creative"] },
+        target_id: { type: "string" },
+        limit: { type: "number" },
+      },
+    },
+  },
+
+  // ---- Criação ----
+  {
+    name: "kaira_create_ad_set",
+    description: "Cria ad set numa campanha. Pegue campaign_id via kaira_list_campaigns.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        campaign_id: { type: "string" },
+        name: { type: "string" },
+        budget: { type: "number" },
+        budget_type: { type: "string", enum: ["daily", "total"] },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+      },
+      required: ["campaign_id", "name"],
+    },
+  },
+  {
+    name: "kaira_create_creative",
+    description: "Cria criativo num ad set. Pegue ad_set_id via kaira_list_ad_sets.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ad_set_id: { type: "string" },
+        name: { type: "string" },
+        format: { type: "string", enum: ["image", "video", "carousel"] },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        url: { type: "string" },
+        ctr: { type: "number" },
+        impressions: { type: "number" },
+        results: { type: "number" },
+        result_label: { type: "string" },
+        cost_per_result: { type: "number" },
+      },
+      required: ["ad_set_id", "name"],
+    },
+  },
+  {
+    name: "kaira_create_task",
+    description: "Cria tarefa na conta do gestor.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        priority: { type: "string", enum: ["low", "medium", "high"] },
+        due_date: { type: "string" },
+      },
+      required: ["title"],
+    },
+  },
+  {
+    name: "kaira_link_audience_to_campaign",
+    description: "Vincula um público a uma campanha (relação N:N).",
+    inputSchema: {
+      type: "object",
+      properties: { audience_id: { type: "string" }, campaign_id: { type: "string" } },
+      required: ["audience_id", "campaign_id"],
+    },
+  },
+
+  // ---- Atualização ----
+  {
+    name: "kaira_update_client",
+    description: "Atualiza cliente. Informe id + só os campos a mudar.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        industry: { type: "string" },
+        monthly_budget: { type: "number" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        notes: { type: "string" },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "kaira_update_campaign",
+    description: "Atualiza campanha. Informe id + só os campos a mudar (ex: status, budget, spend, roas).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        objective: { type: "string" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        budget: { type: "number" },
+        spend: { type: "number" },
+        roas: { type: "number" },
+        budget_type: { type: "string", enum: ["daily", "total"] },
+        budget_strategy: { type: "string", enum: ["cbo", "abo"] },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "kaira_update_ad_set",
+    description: "Atualiza ad set. Informe id + campos a mudar.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        budget: { type: "number" },
+        budget_type: { type: "string", enum: ["daily", "total"] },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "kaira_update_creative",
+    description: "Atualiza criativo, inclusive métricas (ctr, impressões, resultados, custo). Informe id + campos a mudar.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+        format: { type: "string", enum: ["image", "video", "carousel"] },
+        url: { type: "string" },
+        ctr: { type: "number" },
+        impressions: { type: "number" },
+        results: { type: "number" },
+        result_label: { type: "string" },
+        cost_per_result: { type: "number" },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "kaira_update_audience",
+    description: "Atualiza público. Informe id + campos a mudar.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        description: { type: "string" },
+        gender: { type: "string", enum: ["all", "male", "female"] },
+        age_min: { type: "number" },
+        age_max: { type: "number" },
+        interests: { type: "array", items: { type: "string" } },
+        size_estimate: { type: "number" },
+        status: { type: "string", enum: ["active", "paused", "archived"] },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "kaira_set_calendar_note_done",
+    description: "Marca nota do calendário como concluída (done=true) ou reabre (done=false). Default: true.",
+    inputSchema: { type: "object", properties: { id: { type: "string" }, done: { type: "boolean" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_set_task_done",
+    description: "Marca tarefa como concluída (done=true) ou reabre (done=false). Default: true.",
+    inputSchema: { type: "object", properties: { id: { type: "string" }, done: { type: "boolean" } }, required: ["id"] },
+  },
+
+  // ---- Exclusão (irreversível) ----
+  {
+    name: "kaira_delete_client",
+    description: "Deleta cliente. CUIDADO: cascateia e apaga TODAS campanhas, ad sets e criativos desse cliente. Confirme com o usuário antes.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_campaign",
+    description: "Deleta campanha. CUIDADO: cascateia e apaga ad sets e criativos dela. Confirme antes.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_ad_set",
+    description: "Deleta ad set. CUIDADO: cascateia e apaga os criativos dele.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_creative",
+    description: "Deleta criativo.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_audience",
+    description: "Deleta público.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_calendar_note",
+    description: "Deleta nota do calendário.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    name: "kaira_delete_task",
+    description: "Deleta tarefa.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
 ];
+
+// ---- Helpers CRUD escopados por dono ----
+// admin client (service role) bypassa RLS, então filtramos user_id em TODA query.
+function opt(v: unknown): string | undefined {
+  return v === undefined || v === null ? undefined : String(v);
+}
+function optNum(v: unknown): number | undefined {
+  return v === undefined || v === null || v === "" ? undefined : Number(v);
+}
+function buildPatch(obj: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) if (v !== undefined) out[k] = v;
+  return out;
+}
+async function ownedUpdate(table: string, id: string, userId: string, patch: Record<string, unknown>, label: string) {
+  const clean = buildPatch(patch);
+  if (Object.keys(clean).length === 0) throw new Error("Nenhum campo pra atualizar foi informado.");
+  const { data, error } = await admin.from(table).update(clean)
+    .eq("id", id).eq("user_id", userId).select("id").maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error(`${label} não encontrado (id ${id}) ou não pertence a você.`);
+  return textContent(`${label} atualizado (id: ${id}). Campos: ${Object.keys(clean).join(", ")}`);
+}
+async function ownedDelete(table: string, id: string, userId: string, label: string) {
+  const { error, count } = await admin.from(table).delete({ count: "exact" })
+    .eq("id", id).eq("user_id", userId);
+  if (error) throw new Error(error.message);
+  if (!count) throw new Error(`${label} não encontrado (id ${id}) ou não pertence a você.`);
+  return textContent(`${label} deletado (id: ${id}).`);
+}
 
 async function callTool(name: string, args: Record<string, unknown>, userId: string) {
   switch (name) {
@@ -304,6 +596,187 @@ async function callTool(name: string, args: Record<string, unknown>, userId: str
       await admin.from("campaigns").insert(camps);
       return textContent(`Seed: ${clients?.length ?? 0} clientes, ${camps.length} campanhas.`);
     }
+
+    // ---- Leitura ----
+    case "kaira_account_summary": {
+      const { data: clients, error: cErr } = await admin
+        .from("clients").select("id, name, monthly_budget, status").eq("user_id", userId);
+      if (cErr) throw new Error(cErr.message);
+      const { data: camps, error: kErr } = await admin
+        .from("campaigns").select("client_id, status, spend, roas").eq("user_id", userId);
+      if (kErr) throw new Error(kErr.message);
+      const round = (n: number) => Math.round(n * 100) / 100;
+      const byClient = (clients ?? []).map((cl) => {
+        const cc = (camps ?? []).filter((k) => k.client_id === cl.id);
+        const spend = cc.reduce((s, k) => s + Number(k.spend ?? 0), 0);
+        const withRoas = cc.filter((k) => Number(k.roas) > 0);
+        const avgRoas = withRoas.length ? withRoas.reduce((s, k) => s + Number(k.roas), 0) / withRoas.length : 0;
+        return {
+          client: cl.name, status: cl.status, monthly_budget: Number(cl.monthly_budget ?? 0),
+          campaigns: cc.length, total_spend: round(spend), avg_roas: round(avgRoas),
+        };
+      });
+      const totals = {
+        clients: clients?.length ?? 0, campaigns: camps?.length ?? 0,
+        total_spend: round((camps ?? []).reduce((s, k) => s + Number(k.spend ?? 0), 0)),
+      };
+      return textContent(JSON.stringify({ totals, by_client: byClient }, null, 2));
+    }
+    case "kaira_list_campaigns": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("campaigns")
+        .select("id, client_id, name, objective, status, budget, spend, roas, budget_type, budget_strategy")
+        .eq("user_id", userId);
+      if (args.client_id) q = q.eq("client_id", String(args.client_id));
+      if (args.status) q = q.eq("status", String(args.status));
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ campaigns: data ?? [] }, null, 2));
+    }
+    case "kaira_list_ad_sets": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("ad_sets")
+        .select("id, campaign_id, name, status, budget, budget_type").eq("user_id", userId);
+      if (args.campaign_id) q = q.eq("campaign_id", String(args.campaign_id));
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ ad_sets: data ?? [] }, null, 2));
+    }
+    case "kaira_list_creatives": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("creatives")
+        .select("id, ad_set_id, name, format, status, url, ctr, impressions, results, result_label, cost_per_result")
+        .eq("user_id", userId);
+      if (args.ad_set_id) q = q.eq("ad_set_id", String(args.ad_set_id));
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ creatives: data ?? [] }, null, 2));
+    }
+    case "kaira_list_audiences": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      const { data, error } = await admin.from("audiences")
+        .select("id, name, description, gender, age_min, age_max, interests, status, size_estimate")
+        .eq("user_id", userId).order("created_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ audiences: data ?? [] }, null, 2));
+    }
+    case "kaira_list_calendar_notes": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("calendar_notes")
+        .select("id, title, description, date, priority, done, link_type, link_id").eq("user_id", userId);
+      if (args.from) q = q.gte("date", String(args.from));
+      if (args.to) q = q.lte("date", String(args.to));
+      if (args.only_pending) q = q.eq("done", false);
+      const { data, error } = await q.order("date", { ascending: true }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ notes: data ?? [] }, null, 2));
+    }
+    case "kaira_list_tasks": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("ai_tasks")
+        .select("id, title, description, priority, due_date, done, source").eq("user_id", userId);
+      if (args.only_pending) q = q.eq("done", false);
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ tasks: data ?? [] }, null, 2));
+    }
+    case "kaira_list_timeline": {
+      const limit = Math.min(Number(args.limit ?? 50), 200);
+      let q = admin.from("timeline_entries")
+        .select("id, target_type, target_id, type, description, details, impact, occurred_at").eq("user_id", userId);
+      if (args.target_type) q = q.eq("target_type", String(args.target_type));
+      if (args.target_id) q = q.eq("target_id", String(args.target_id));
+      const { data, error } = await q.order("occurred_at", { ascending: false }).limit(limit);
+      if (error) throw new Error(error.message);
+      return textContent(JSON.stringify({ timeline: data ?? [] }, null, 2));
+    }
+
+    // ---- Criação ----
+    case "kaira_create_ad_set": {
+      const { data, error } = await admin.from("ad_sets").insert({
+        user_id: userId, campaign_id: String(args.campaign_id), name: String(args.name),
+        budget: optNum(args.budget) ?? 0, budget_type: opt(args.budget_type) ?? "daily",
+        status: opt(args.status) ?? "active",
+      }).select("id, name").single();
+      if (error) throw new Error(error.message);
+      return textContent(`Ad set criado: ${data.name} (id: ${data.id})`);
+    }
+    case "kaira_create_creative": {
+      const { data, error } = await admin.from("creatives").insert({
+        user_id: userId, ad_set_id: String(args.ad_set_id), name: String(args.name),
+        format: opt(args.format) ?? "image", status: opt(args.status) ?? "active",
+        url: opt(args.url) ?? null, ctr: optNum(args.ctr) ?? 0,
+        impressions: optNum(args.impressions) ?? 0, results: optNum(args.results) ?? 0,
+        result_label: opt(args.result_label) ?? "conversas", cost_per_result: optNum(args.cost_per_result) ?? 0,
+      }).select("id, name").single();
+      if (error) throw new Error(error.message);
+      return textContent(`Criativo criado: ${data.name} (id: ${data.id})`);
+    }
+    case "kaira_create_task": {
+      const { data, error } = await admin.from("ai_tasks").insert({
+        user_id: userId, title: String(args.title),
+        description: opt(args.description) ?? null, priority: opt(args.priority) ?? "medium",
+        due_date: opt(args.due_date) ?? null, source: "mcp",
+      }).select("id, title").single();
+      if (error) throw new Error(error.message);
+      return textContent(`Tarefa criada: ${data.title} (id: ${data.id})`);
+    }
+    case "kaira_link_audience_to_campaign": {
+      const { error } = await admin.from("audience_campaigns").insert({
+        user_id: userId, audience_id: String(args.audience_id), campaign_id: String(args.campaign_id),
+      });
+      if (error) throw new Error(error.message);
+      return textContent(`Público ${args.audience_id} vinculado à campanha ${args.campaign_id}.`);
+    }
+
+    // ---- Atualização ----
+    case "kaira_update_client":
+      return ownedUpdate("clients", String(args.id), userId, {
+        name: opt(args.name), industry: opt(args.industry), monthly_budget: optNum(args.monthly_budget),
+        status: opt(args.status), notes: opt(args.notes),
+      }, "Cliente");
+    case "kaira_update_campaign":
+      return ownedUpdate("campaigns", String(args.id), userId, {
+        name: opt(args.name), objective: opt(args.objective), status: opt(args.status),
+        budget: optNum(args.budget), spend: optNum(args.spend), roas: optNum(args.roas),
+        budget_type: opt(args.budget_type), budget_strategy: opt(args.budget_strategy),
+      }, "Campanha");
+    case "kaira_update_ad_set":
+      return ownedUpdate("ad_sets", String(args.id), userId, {
+        name: opt(args.name), status: opt(args.status),
+        budget: optNum(args.budget), budget_type: opt(args.budget_type),
+      }, "Ad set");
+    case "kaira_update_creative":
+      return ownedUpdate("creatives", String(args.id), userId, {
+        name: opt(args.name), status: opt(args.status), format: opt(args.format), url: opt(args.url),
+        ctr: optNum(args.ctr), impressions: optNum(args.impressions), results: optNum(args.results),
+        result_label: opt(args.result_label), cost_per_result: optNum(args.cost_per_result),
+      }, "Criativo");
+    case "kaira_update_audience":
+      return ownedUpdate("audiences", String(args.id), userId, {
+        name: opt(args.name), description: opt(args.description), gender: opt(args.gender),
+        age_min: optNum(args.age_min), age_max: optNum(args.age_max), status: opt(args.status),
+        size_estimate: optNum(args.size_estimate),
+        interests: Array.isArray(args.interests) ? args.interests : undefined,
+      }, "Público");
+    case "kaira_set_calendar_note_done":
+      return ownedUpdate("calendar_notes", String(args.id), userId, {
+        done: args.done === undefined ? true : Boolean(args.done),
+      }, "Nota");
+    case "kaira_set_task_done":
+      return ownedUpdate("ai_tasks", String(args.id), userId, {
+        done: args.done === undefined ? true : Boolean(args.done),
+      }, "Tarefa");
+
+    // ---- Exclusão ----
+    case "kaira_delete_client": return ownedDelete("clients", String(args.id), userId, "Cliente");
+    case "kaira_delete_campaign": return ownedDelete("campaigns", String(args.id), userId, "Campanha");
+    case "kaira_delete_ad_set": return ownedDelete("ad_sets", String(args.id), userId, "Ad set");
+    case "kaira_delete_creative": return ownedDelete("creatives", String(args.id), userId, "Criativo");
+    case "kaira_delete_audience": return ownedDelete("audiences", String(args.id), userId, "Público");
+    case "kaira_delete_calendar_note": return ownedDelete("calendar_notes", String(args.id), userId, "Nota");
+    case "kaira_delete_task": return ownedDelete("ai_tasks", String(args.id), userId, "Tarefa");
+
     default:
       throw new Error(`Tool desconhecida: ${name}`);
   }
@@ -315,7 +788,7 @@ async function handleRpc(req: JsonRpcReq, userId: string) {
       return rpcResult(req.id, {
         protocolVersion: "2024-11-05",
         capabilities: { tools: {} },
-        serverInfo: { name: "kaira-mcp", version: "1.1.0" },
+        serverInfo: { name: "kaira-mcp", version: "1.2.0" },
       });
     case "ping":
       return rpcResult(req.id, {});
@@ -347,16 +820,18 @@ async function handleRpc(req: JsonRpcReq, userId: string) {
 function protectedResourceMetadata() {
   return {
     resource: PUBLIC_MCP_URL,
-    authorization_servers: [PUBLIC_MCP_URL],
+    authorization_servers: [PUBLIC_APP_URL],
     bearer_methods_supported: ["header"],
     resource_documentation: "https://gestorkaira.vercel.app/settings#connectors",
+    resource_name: "Kaira",
+    logo_uri: `${PUBLIC_APP_URL}/kaira-logo-96.png`,
   };
 }
 
 // RFC 8414 — OAuth Authorization Server Metadata
 function authServerMetadata() {
   return {
-    issuer: PUBLIC_MCP_URL,
+    issuer: PUBLIC_APP_URL,
     authorization_endpoint: `${PUBLIC_APP_URL}/authorize`,
     token_endpoint: `${PUBLIC_MCP_URL}/token`,
     registration_endpoint: `${PUBLIC_MCP_URL}/register`,
@@ -365,6 +840,7 @@ function authServerMetadata() {
     code_challenge_methods_supported: ["S256", "plain"],
     token_endpoint_auth_methods_supported: ["none", "client_secret_post"],
     scopes_supported: ["mcp"],
+    logo_uri: `${PUBLIC_APP_URL}/kaira-logo-96.png`,
   };
 }
 
@@ -487,7 +963,7 @@ serve(async (req) => {
 
   // GET / — health
   if (req.method === "GET" && (path === "/" || path === "")) {
-    return jsonResp({ name: "kaira-mcp", version: "1.1.0", status: "ready" });
+    return jsonResp({ name: "kaira-mcp", version: "1.2.0", status: "ready" });
   }
 
   // POST / — MCP JSON-RPC (requires auth)
@@ -501,7 +977,7 @@ serve(async (req) => {
           headers: {
             ...cors,
             "Content-Type": "application/json",
-            "WWW-Authenticate": `Bearer realm="kaira-mcp", error="invalid_token"`,
+            "WWW-Authenticate": `Bearer realm="kaira-mcp", error="invalid_token", resource_metadata="${PUBLIC_APP_URL}/.well-known/oauth-protected-resource"`,
           },
         },
       );
