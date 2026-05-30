@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { ConnectorGuide } from "@/components/settings/ConnectorGuide";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -156,6 +157,8 @@ export function ConnectorsSection() {
             </p>
           </div>
         </div>
+
+        <ConnectorGuide />
 
         <div className="space-y-3">
           <div className="flex items-center gap-2 pt-1">
