@@ -136,20 +136,34 @@ export function ConnectorsSection() {
               <Copy className="w-3.5 h-3.5" />
             </Button>
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            Cole essa URL como Custom Connector no Claude.ai junto com uma chave abaixo.{" "}
-            <a
-              href="https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp"
-              target="_blank"
-              rel="noreferrer"
-              className="text-cobalt hover:underline inline-flex items-center gap-1"
-            >
-              Como configurar <ExternalLink className="w-3 h-3" />
-            </a>
-          </p>
+          <div className="text-[11px] text-muted-foreground space-y-1.5">
+            <p className="text-foreground font-medium">No Claude.ai (recomendado):</p>
+            <ol className="list-decimal list-inside space-y-0.5 pl-0.5">
+              <li>Settings → <strong>Custom Connectors</strong> → Add custom connector</li>
+              <li>Cola <strong>só esta URL</strong> (não precisa de chave)</li>
+              <li>Clica conectar → autoriza na tela do Kaira que abrir</li>
+            </ol>
+            <p className="pt-0.5">
+              A conexão usa OAuth — a chave abaixo é só pra clientes MCP que <em>não</em> suportam OAuth.{" "}
+              <a
+                href="https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp"
+                target="_blank"
+                rel="noreferrer"
+                className="text-cobalt hover:underline inline-flex items-center gap-1"
+              >
+                Como configurar <ExternalLink className="w-3 h-3" />
+              </a>
+            </p>
+          </div>
         </div>
 
         <div className="space-y-3">
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-xs font-medium text-foreground">Chave de API</span>
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border">
+              Avançado · clientes sem OAuth
+            </span>
+          </div>
           <div className="flex items-end gap-2">
             <div className="flex-1 space-y-1.5">
               <Label htmlFor="key-name" className="text-xs uppercase tracking-wider text-muted-foreground">Nome da chave (opcional)</Label>
@@ -245,13 +259,15 @@ export function ConnectorsSection() {
               <div className="rounded-lg border border-glass-border bg-surface-2/40 p-3 text-[11px] text-muted-foreground space-y-1">
                 <p className="text-foreground font-medium flex items-start gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" />
-                  Pra configurar no Claude.ai:
+                  Quando usar esta chave:
                 </p>
-                <ol className="list-decimal list-inside space-y-0.5 pl-1">
-                  <li>Claude.ai → Settings → <strong>Custom Connectors</strong></li>
-                  <li>Add custom connector → cola URL e chave acima</li>
-                  <li>Habilita no chat → fala: "Cria 5 clientes demo no Kaira"</li>
-                </ol>
+                <p>
+                  Só em clientes MCP que pedem um token e <strong>não</strong> têm botão de autorizar
+                  (sem OAuth). Cola a URL do conector + esta chave como Bearer.
+                </p>
+                <p className="pt-1 text-muted-foreground/80">
+                  No Claude.ai normal você <strong>não precisa dela</strong> — basta a URL e autorizar.
+                </p>
               </div>
             </div>
           )}
